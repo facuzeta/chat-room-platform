@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+
+{% include "head.html" %}
+
+
+
+<body>
+
+    <script>
+        var counter_intro = 0;
+        function next_intro() {
+            $('#step_intro_' + counter_intro).css('display', 'none');
+            counter_intro += 1
+            $('#step_intro_' + counter_intro).css('display', '');
+        }
+    </script>
+
+    <div style=''>
+
+    <div class='' style="background-color: #6abc3a; height:250px"></div>
+    <div class='' style="background-color: #f7f7f7; height:400px"></div>
+
+
+        <div style='width:50%;margin:0 auto; background-color: white;
+            border-radius: 30px;padding: 70px;  margin-top:-600px;'>
+
+            <div>{{cms.welcome_title}}</div>
+            <div class='color-green' style='font-weight: unset;font-size: 24px;margin-bottom: 50px;'>
+            {{cms.welcome_subtitle}}
+            </div>
+
+            <div style='margin-top:20px' class='step-intro' id='step_intro_0'>
+
+                {{cms.welcome_text|safe}}
+
+                <button type='submit' style='margin-top:20px;' class='btn btn-green btn-block' style='color:white'
+                    onclick='next_intro()'>{{cms.next}}</button>
+
+            </div>
+
+            <div style='margin-top:20px; display:none' class='step-intro' id='step_intro_1'>
+
+                {{cms.rules|safe}}
+                <button type='submit' style='margin-top:20px;' class='btn btn-green btn-block' style='color:white'
+                    onclick='next_intro()'>{{cms.next}}</button>
+
+            </div>
+
+            <div style='margin-top:20px; display:none' class='step-intro' id='step_intro_2'>
+
+                {{cms.screenshots_intro|safe}}
+                <br>
+                <br>
+
+                <img src='/static/screenshot.png' style='width:100%'>
+                <button type='submit' style='margin-top:20px;' class='btn btn-green btn-block' style='color:white'
+                    onclick='next_intro()'>{{cms.next}}</button>
+
+            </div>
+
+            <div style='margin-top:20px; display:none' class='step-intro' id='step_intro_3'>
+                <div style='margin-bottom:40px'>{{cms.welcome__form_instructions}}</div>
+
+                <form action='/home' method='post'>
+                    {% csrf_token %}
+                    <input class=' form-control' type='text' name='nickname' required
+                        placeholder='{{cms.welcome_placeholder_nickname}}' />
+                    <br>
+
+                    <input class=' form-control' type='number' name='age'  placeholder='{{cms.welcome__age}}' />
+
+                    <br>
+
+                    <select class=' form-control' name='gender'>
+                        <option> Género</option>
+                        <option>Femenino</option>
+                        <option>Masculino</option>
+                        <option>No binario</option>
+                        <option>Género Fluido</option>
+                        <option>Otro</option>
+                        <option>No especificado</option>
+                    </select>
+
+                    <br>
+
+                    <select class=' form-control' name='education'>
+                        <option> Maximo nivel educativo alcanzado</option>
+                        <option> Primaria completa</option>
+                        <option> Secundaria completa</option>
+                        <option> Universitario completo</option>
+                        <option> Postgrado completo</option>
+                    </select>
+
+                    <br>
+                    <input type='submit' class='btn btn-green btn-block' style='color:white' value='{{cms.welcome__start}}' />
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+
+
+
+
+
+
+
+</body>
+
+</html>

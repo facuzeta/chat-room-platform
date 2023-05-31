@@ -1,0 +1,558 @@
+[
+{
+  "model": "cms.content",
+  "pk": 1,
+  "fields": {
+    "key": "test"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 2,
+  "fields": {
+    "key": "nav_title_experiment_name"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 3,
+  "fields": {
+    "key": "sync_server"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 4,
+  "fields": {
+    "key": "state_title"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 5,
+  "fields": {
+    "key": "ws1_title"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 6,
+  "fields": {
+    "key": "ws1_text"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 7,
+  "fields": {
+    "key": "chat_intro"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 8,
+  "fields": {
+    "key": "welcome_text"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 9,
+  "fields": {
+    "key": "rules"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 10,
+  "fields": {
+    "key": "your_answer"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 11,
+  "fields": {
+    "key": "your_confidence"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 12,
+  "fields": {
+    "key": "stage"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 13,
+  "fields": {
+    "key": "consensus"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 14,
+  "fields": {
+    "key": "msg_wait_a_seconds_to_next_stage"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 15,
+  "fields": {
+    "key": "question"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 16,
+  "fields": {
+    "key": "consensus_chat"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 17,
+  "fields": {
+    "key": "trigger_to_chat"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 18,
+  "fields": {
+    "key": "s1_s3_complete_your_answer_placeholder"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 19,
+  "fields": {
+    "key": "question_input_confidence_class__text"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 20,
+  "fields": {
+    "key": "next"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 21,
+  "fields": {
+    "key": "end"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 22,
+  "fields": {
+    "key": "slider_confidence_0"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 23,
+  "fields": {
+    "key": "slider_confidence_1"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 24,
+  "fields": {
+    "key": "slider_confidence_2"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 25,
+  "fields": {
+    "key": "slider_confidence_3"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 26,
+  "fields": {
+    "key": "slider_confidence_4"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 27,
+  "fields": {
+    "key": "welcome_subtitle"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 28,
+  "fields": {
+    "key": "welcome_title"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 29,
+  "fields": {
+    "key": "welcome__age"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 30,
+  "fields": {
+    "key": "welcome_placeholder_nickname"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 31,
+  "fields": {
+    "key": "welcome__form_instructions"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 32,
+  "fields": {
+    "key": "welcome__start"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 1,
+  "fields": {
+    "key": 1,
+    "lang": "es",
+    "text": "probando!"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 2,
+  "fields": {
+    "key": 1,
+    "lang": "en",
+    "text": "testing!"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 3,
+  "fields": {
+    "key": 2,
+    "lang": "es",
+    "text": "Discusiones y consensos"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 4,
+  "fields": {
+    "key": 3,
+    "lang": "es",
+    "text": "Sincronizando con el servidor"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 5,
+  "fields": {
+    "key": 4,
+    "lang": "es",
+    "text": "Estado"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 6,
+  "fields": {
+    "key": 5,
+    "lang": "es",
+    "text": "Por favor esperá que se sumen todos los participantes."
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 7,
+  "fields": {
+    "key": 6,
+    "lang": "es",
+    "text": "Mientras tanto podes repasar las reglas"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 8,
+  "fields": {
+    "key": 7,
+    "lang": "es",
+    "text": "Por discutan coordialmente e intente alcanzar un consenso"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 9,
+  "fields": {
+    "key": 8,
+    "lang": "es",
+    "text": "<p>El objetivo de esta investigación es estudiar cómo formamos nuestras opiniones y confianza sobre\r\n                    temas polémicos que nos afectan como sociedad.</p>\r\n\r\n                <p>La duración total es de unos 10 minutos, tu participación es absolutamente voluntaria y puede\r\n                    finalizar cuando lo desees. No esperamos ningún tipo de inconveniente o riesgo por participar. Los\r\n                    datos de identidad son confidenciales, están anonimizados y encriptados y serán usados\r\n                    exclusivamente para investigación.\r\n                </p>\r\n\r\n                <p>Este experimento es parte de un estudio que estamos haciendo en colaboración con el Laboratorio de\r\n                    Neurociencia de la Universidad Torcuato Di Tella. .</p>"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 10,
+  "fields": {
+    "key": 9,
+    "lang": "es",
+    "text": "<p>\r\n                    Este experimento tiene 3 etapas:\r\n                </p>\r\n\r\n                <ul>\r\n                    <li>Etapa 1: Vas a responder individualmente 8 preguntas</li>\r\n                    <li>Etapa 2: Vas a chatear con otros participantes para ponerte de acuerdo en 4 preguntas</li>\r\n                    <li>Etapa 3: Vas a responder nuevamente las mismas 8 preguntas</li>\r\n                </ul>\r\n                <p>Cada etapa tiene un tiempo máximo para responderla, tras pasar ese tiempo se redirigirá\r\n                    automáticamente a la siguiente etapa.</p>"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 11,
+  "fields": {
+    "key": 10,
+    "lang": "es",
+    "text": "Respuesta"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 12,
+  "fields": {
+    "key": 11,
+    "lang": "es",
+    "text": "Confianza"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 13,
+  "fields": {
+    "key": 12,
+    "lang": "es",
+    "text": "Etapa"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 14,
+  "fields": {
+    "key": 13,
+    "lang": "es",
+    "text": "Consenso"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 15,
+  "fields": {
+    "key": 14,
+    "lang": "es",
+    "text": "En instantes vas a pasar a la siguiente etapa."
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 16,
+  "fields": {
+    "key": 15,
+    "lang": "es",
+    "text": "Pregunta"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 17,
+  "fields": {
+    "key": 16,
+    "lang": "es",
+    "text": "Respuesta enviada:"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 18,
+  "fields": {
+    "key": 17,
+    "lang": "es",
+    "text": "Nueva pregunta para discutir:"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 19,
+  "fields": {
+    "key": 18,
+    "lang": "es",
+    "text": "Completa tu respuesta"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 20,
+  "fields": {
+    "key": 19,
+    "lang": "es",
+    "text": "¿Cuán confiado estas de tu respuesta?"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 21,
+  "fields": {
+    "key": 20,
+    "lang": "es",
+    "text": "Siguiente"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 22,
+  "fields": {
+    "key": 21,
+    "lang": "es",
+    "text": "Terminar"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 23,
+  "fields": {
+    "key": 22,
+    "lang": "es",
+    "text": "Nada"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 24,
+  "fields": {
+    "key": 23,
+    "lang": "es",
+    "text": "Poco"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 25,
+  "fields": {
+    "key": 24,
+    "lang": "es",
+    "text": "Masomenos"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 26,
+  "fields": {
+    "key": 25,
+    "lang": "es",
+    "text": "Muy"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 27,
+  "fields": {
+    "key": 26,
+    "lang": "es",
+    "text": "Mucho"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 28,
+  "fields": {
+    "key": 27,
+    "lang": "es",
+    "text": "Te damos la bienvenida"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 29,
+  "fields": {
+    "key": 28,
+    "lang": "es",
+    "text": "¡Gracias por tu participación!"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 30,
+  "fields": {
+    "key": 29,
+    "lang": "es",
+    "text": "Edad"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 31,
+  "fields": {
+    "key": 30,
+    "lang": "es",
+    "text": "¿Cómo querés que te llamemos?"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 32,
+  "fields": {
+    "key": 31,
+    "lang": "es",
+    "text": "Completá tus datos por favor"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 33,
+  "fields": {
+    "key": 32,
+    "lang": "es",
+    "text": "Comenzar"
+  }
+},
+{
+  "model": "cms.config",
+  "pk": "MAX_GROUP_SIZE",
+  "fields": {
+    "value": "8"
+  }
+},
+{
+  "model": "cms.config",
+  "pk": "MAX_TIME_ACTIVE_PARTICIPANT_SECO",
+  "fields": {
+    "value": "9"
+  }
+},
+{
+  "model": "cms.config",
+  "pk": "MAX_TIME_ACTIVE_PARTICIPANT_SECONDS",
+  "fields": {
+    "value": "9"
+  }
+},
+{
+  "model": "cms.config",
+  "pk": "MIN_GROUP_SIZE",
+  "fields": {
+    "value": "1"
+  }
+},
+{
+  "model": "cms.config",
+  "pk": "POLLINF_FREQ_IN_MS",
+  "fields": {
+    "value": "3000"
+  }
+}
+]

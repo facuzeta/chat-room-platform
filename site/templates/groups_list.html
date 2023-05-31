@@ -1,0 +1,44 @@
+{% extends "base.html"%}
+
+
+{% block content %}
+<div style="padding:40px">
+
+    <h4>Grupos</h4>
+    <label>(no se actualiza automaticamente, hay que hacer refresh)</label>
+    <div id='groups' class="" style="width:80%">
+        <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+            <thead class="thead-light">
+
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">#participants</th>
+                    <th scope="col">timestamp</th>
+                    <th scope="col"></th>
+                    <th># evluados x mi</th>
+                    <th>experiment_id</th>
+                    <th>is_testing</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for g, n_evaluations in groups %}
+                <tr>
+                    <td>{{g.id}}</td>
+                    <td>{{g.name}}</td>
+                    <td>{{g.participants.all|length}}</td>
+                    <td>{{g.timestamp}}</td>
+                    <td><a href='/manager/group_status/{{g.id}}' target='_blank'>Ver más</a></td>
+                    <td>{{n_evaluations}}</td>
+                    <td>{{g.experiment}}</td>
+                    <td>{{g.is_testing}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

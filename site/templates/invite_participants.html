@@ -1,0 +1,181 @@
+{% extends "base.html"%}
+{% block content %}
+
+
+
+<div style="padding:40px">
+
+    <h4>Agregar nuevo participante con lista de emails</h4>
+    <span>separados por espacios</span>
+    <input class='form-control' id="email_list" type="text"  style='width:100%' value='lala@las.com sdsd@gmail.com' />
+    <br>
+    <input required class='form-control' type='datetime-local' id='email_list__exp_ts' name='email_list__exp_ts' placeholder='Fecha experimento'>
+    <br>
+    <br>
+
+    <a class='btn btn-success' href="javascript:create_participants_from_email_list()">Crear participantes y enviar invitación</a>
+
+    {% comment %} <a class='btn btn-success' href="javascript:create_participants_from_email_list('true')">Crear participantes y enviar invitación MORAL</a>
+    <a class='btn btn-success' href="javascript:create_participants_from_email_list('false')">Crear participantes y enviar invitación FACTICO</a> {% endcomment %}
+
+    <br>
+    <br>
+    <h4>Status de envio de invitaciones</h4>
+    <div id="logs_mails_enviados"></div>
+<br>
+<br>
+<h4>Agregar nuevo participante</h4>
+Esto permite agregar participantes a la base de datos pero NO envia una invitación por mail para el mismo, para eso se debe presionar el boton de mas abajo. El datetime esta en UTC-3
+<br>
+<a class='' href='javascript:add_inputs_participant()'>+ Agregar otra fila de participante</a>
+<br>
+<form action='/manager/create_participant' method='post'>
+    <div id='input_rows' class="form-inline"></div>
+<br>
+
+    <input type='submit' class='btn btn-success'  value='Crear participante(s)'>
+</form>
+<br>
+<br>
+<br>
+<hr>
+ 
+        <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+            <thead class="thead-light">
+
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">username</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellido</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Fecha experimento</th>
+                    <th scope="col"></th>
+                    <th scope="col">Invitación ya enviada</th>
+                    <th scope="col">Fecha invitación</th>
+                    <th scope="col"></th>
+                    {% comment %} <th scope="col"></th> {% endcomment %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in participants %}
+
+                <tr>
+                    <form action='/manager/save_participants_data' method='post'>
+                        <input type='hidden' name='participant_id' value={{p.id}} >
+                        <td>{{p.id}}</td>
+                        <td>{{p.user.username}}</td>
+                        <td><input required name='first_name' value="{{p.user.first_name}}" style='width:110px'></td>
+                        <td><input required name='last_name' value="{{p.user.last_name}}" style='width:110px'></td>
+                        <td><input required type='email' name='email' value="{{p.user.email}}"></td>
+                        <td><input required type='datetime-local' name='experiment_timestamp' value="{{p.experiment_timestamp|date:'Y-m-d'}}T{{p.experiment_timestamp|time:'H:i:s'}}"></td>
+                        <td> <input type='submit' class='btn btn-success' value='Guardar'/> </td>
+                    </form>
+                    <td><div id='invitation_send_flag__{{p.id}}'>{{p.invitation_send}}</div></td>
+                    <td><div id='invitation_send_when__{{p.id}}'>{{p.invitation_send_when}}</div></td>
+                    <td><div id='action_resend_invitation__{{p.id}}'><a href="javascript:send_invitation({{p.id}})">(R)Enviar invitación</a></div></td>
+                    {% comment %} <td><div id='action_resend_invitation__{{p.id}}'><a href="javascript:send_invitation({{p.id}},'true')">(R)Enviar invitación MORAL</a></div></td> {% endcomment %}
+                    {% comment %} <td><div id='action_resend_invitation__{{p.id}}'><a href="javascript:send_invitation({{p.id}}, 'false')">(R)Enviar invitación FACTICO</a></div></td> {% endcomment %}
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+
+<script>
+
+counter = 0;
+// sv-SE match with the html input format
+last_timestamp =  new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Buenos_Aires',year:'numeric', month: '2-digit', day:'2-digit',hour:'2-digit',minute:'2-digit'}).replaceAll('/','-').replace(' ','T')
+
+function send_invitation(p_id, is_moral){
+    console.log('send_invitation',p_id);
+    $('#action_resend_invitation__'+p_id).html('Enviada!')
+    $('#invitation_send_flag__'+p_id).html('True')
+    $('#invitation_send_when__'+p_id).html(new Date().toLocaleTimeString())
+    $.post('/manager/send_invitation/'+p_id+'?is_moral='+is_moral);
+}
+
+async function send_invitation_async(p_id, is_moral){
+    return await $.post('/manager/send_invitation/'+p_id+'?is_moral='+is_moral, function(){
+    });
+}
+
+
+function update_last_timestamp(){
+   last_timestamp=  $("#experiment_timestamp").val()
+   console.log(last_timestamp)
+}
+
+function add_inputs_participant(){
+    html = "<div id='row_"+counter+"' style='margin-top:10px'>";
+    html +="<input required class='form-control' name='first_name' placeholder='First Name'> ";
+    html +="<input required class='form-control' name='last_name' placeholder='Last Name'> ";
+    html +="<input required class='form-control' type='email' name='email' placeholder='email'> ";
+    html +="<input required class='form-control' type='datetime-local' id='experiment_timestamp' name='experiment_timestamp' placeholder='Fecha experimento' value='"+last_timestamp+"' onchange='update_last_timestamp()'> ";
+    html +=' <a href="javascript:delete_row('+counter+')">(borrar fila)</a>'
+    html +='</div>'
+
+
+
+    counter +=1;
+
+    $("#input_rows").append(html)
+}
+
+function delete_row(i){
+    $('#row_'+i).remove()
+}
+
+async function send_invitations_list_of_participants_ids_and_then_reload(created_participants_ids, is_moral){
+
+    $("#logs_mails_enviados").html('Empezando envio de emails')
+    for (var i=0; i< created_participants_ids.length; i++){
+        var p_id = created_participants_ids[i];
+        await send_invitation_async(p_id, is_moral);
+        $("#logs_mails_enviados").html('Enviado(s) '+i+' de '+created_participants_ids.length )
+
+    }
+    $("#logs_mails_enviados").html('Todos los mails fueron enviados')
+    location.reload();
+}
+
+
+async function create_participants_from_email_list(is_moral){
+    var emails = $("#email_list").val().split(' ');
+    var data = [];
+    experiment_timestamp = $("#email_list__exp_ts").val();
+    data = {'emails': emails, 'experiment_timestamp': experiment_timestamp}
+    
+
+    console.log(data)
+    $.post('/manager/create_participant_mail_list', data, res=>{send_invitations_list_of_participants_ids_and_then_reload(res, is_moral)});
+}
+
+
+function makeid() {
+    length = 5;
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
+}
+
+function fill_datetime_exp_email_list(){
+    $("#email_list__exp_ts").val(last_timestamp);
+
+}
+
+$(add_inputs_participant)
+$(fill_datetime_exp_email_list)
+
+</script>
+
+
+
+{% endblock %}

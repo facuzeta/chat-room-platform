@@ -1,0 +1,270 @@
+{% extends "base.html"%}
+
+
+{% block content %}
+
+
+<script>
+
+    function send_expert_evaluation(stage_name, group_id){
+        console.log(stage_name)
+        data = []
+        $(".expert_evaluation__"+stage_name).each( function(i){
+            var question_id = this.id.split('__')[2];
+            var value = this.value
+            if (value != '') data.push({'question_id': question_id, 'value':value, 'stage_name': stage_name, 'group_id':group_id})
+        })
+        console.log(data)
+        $.post("{% url 'save_expert_valuation' %}", {'answers':JSON.stringify(data)}, function(){
+            // hide button
+            $('#send_expert_evaluation_btn__'+stage_name).hide();
+        })
+    }
+
+</script>
+
+<div style='padding:10px'>
+
+    <div class='row'>
+        <div class="col col-4">
+            <div class="card" style="min-height: 150px;max-width:400px">
+                <div class="card-header">Info grupo</div>
+                <div class="card-body">
+                    id: {{group.id}} <br>
+                    name: {{group.name}} <br>
+                    experiment: {{group.experiment}} <br>
+                    is_testing: {{group.is_testing}} <br>
+                    <b>Instrucciones:</b><br> {{group.experiment.instructions_s2}} <br>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col col-4">
+            <div class="card" style="min-height: 150px;max-width:400px">
+                <div class="card-header">S1 y S3: 8 preguntas orden</div>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                        <tbody>
+                            {% for q in group.question_order %}
+                            <tr>
+                                <td>{{q.question_id}}</td>
+                                <td>{{q.text}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col col-4">
+            <div class="card" style="min-height: 150px;max-width:400px">
+                <div class="card-header">S2: 4 preguntas orden</div>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                        <tbody>
+                            {% for q in group.question_order_s2 %}
+                            <tr>
+                                <td>{{q.question_id}}</td>
+                                <td>{{q.text}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br>
+
+
+    <h3>S1</h3>
+
+    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='tabla_s1'>
+        <thead class="thead-light">
+
+            <tr>
+                <td scope="col">participant_id</td>
+                <td scope="col">name</td>
+                <td scope="col">stage</td>
+                {% for q in group.question_order %}
+                <td>s1_q_{{q.question_id}}_index</td>
+                <td>s1_q_{{q.question_id}}_value</td>
+                <td>s1_q_{{q.question_id}}_confidence</td>
+                <td>s1_q_{{q.question_id}}_duration </td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in group.participants.all%}
+            <tr>
+                <td>{{p.id}}</td>
+                <td>{{p.get_nickname}}</td>
+                <td>{{p.get_current_stage}}</td>
+                {% for ans in p.answers_s1%}
+                <td>{{ans.index_current_question}}</td>
+                <td>{{ans.input_value}}</td>
+                <td>{{ans.confidence}}</td>
+                <td>{{ans.duration}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+    <script>
+        // transpongo más facilmente la tabla_s1
+        $("#tabla_s1").each(function () {
+            var $this = $(this);
+            var newrows = [];
+            $this.find("tr").each(function () {
+                var i = 0;
+                $(this).find("td").each(function () {
+                    i++;
+                    if (newrows[i] === undefined) { newrows[i] = $("<tr></tr>"); }
+                    newrows[i].append($(this));
+                });
+            });
+            $this.find("tr").remove();
+            $.each(newrows, function () {
+                $this.append(this);
+            });
+        });
+    </script>
+
+
+
+
+    <h3>S2 consenso</h3>
+  
+    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='tabla_s2_consensos'>
+        <thead class="thead-light">
+        </thead>
+        <tbody>
+
+            {% for p in group.participants.all %}
+                <tr>
+                    <td> {{p}} </td>
+                    <td> {{p.answers_s2}} </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+
+    <h3>S3</h3>
+
+    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='tabla_s3'>
+        <thead class="thead-light">
+
+            <tr>
+                <td scope="col">participant_id</td>
+                <td scope="col">name</td>
+                <td scope="col">stage</td>
+                {% for q in group.question_order %}
+                <td>s1_q_{{q.question_id}}_index</td>
+                <td>s1_q_{{q.question_id}}_value</td>
+                <td>s1_q_{{q.question_id}}_confidence</td>
+                <td>s1_q_{{q.question_id}}_duration </td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in group.participants.all%}
+            <tr>
+                <td>{{p.id}}</td>
+                <td>{{p.name}}</td>
+                <td>{{p.get_current_stage}}</td>
+                {% for ans in p.answers_s3%}
+                <td>{{ans.index_current_question}}</td>
+                <td>{{ans.input_value}}</td>
+                <td>{{ans.confidence}}</td>
+                <td>{{ans.duration}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+    <script>
+        // transpongo más facilmente la tabla
+        $("#tabla_s3").each(function () {
+            var $this = $(this);
+            var newrows = [];
+            $this.find("tr").each(function () {
+                var i = 0;
+                $(this).find("td").each(function () {
+                    i++;
+                    if (newrows[i] === undefined) { newrows[i] = $("<tr></tr>"); }
+                    newrows[i].append($(this));
+                });
+            });
+            $this.find("tr").remove();
+            $.each(newrows, function () {
+                $this.append(this);
+            });
+        });
+    </script>
+
+
+    <h3>Chat</h3>
+    {% for chat, stage, questions_and_answers in chats %}
+    <div class="row">
+        <div class="col col-8">
+
+            <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='chat'>
+                <thead class="thead-light">
+
+                    <tr>
+                        <td scope="col">stage</td>
+                        <td scope="col">timestamp</td>
+                        <td scope="col">participant</td>
+                        <td scope="col">text</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in chat %}
+                    <tr style='background-color: {{c.participant.get_color}}'>
+                        <td>{{c.stage}} </td>
+                        <td>{{c.timestamp|date:'Y-m-d H:i:s'}}</td>
+                        <td>{{c.participant.name}}({{c.participant.id}})</td>
+                        <td>{{c.text}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <br>
+
+            </table>
+        </div>
+        <div class="col col-4">
+            <br>
+            <h4>Evaluación</h4>
+            <br>
+            <form action="javascript:send_expert_evaluation('{{stage}}',{{group.id}})">
+                {% for r in questions_and_answers %}
+                <div class="slidecontainer">
+                    <label for="exampleInputEmail1">{{r.question.text}}</label>
+                    <input type="number" min="0" max="10" value="{{r.answer.value}}" class='slider expert_evaluation__{{stage}}' id="expert_evaluation__{{stage}}__{{r.question.id}}">
+                </div>
+                <br>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary" id="send_expert_evaluation_btn__{{stage}}">Submit</button>
+            </form>
+        </div>
+    </div>
+
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

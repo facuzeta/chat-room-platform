@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="padding:40px">
+    <h4>Botones rapidos</h4>
+
+    <hr>
+
+    <h4>Seleccionadores</h4>
+  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_first_n_options(4)'>Seleccionar 4</a>
+  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_first_n_options(3)'>Seleccionar 3</a>
+  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_n_random(4)'>Seleccionar 4 al azar</a>
+<br>
+<br>
+<h4>Crear grupo</h4>
+{% for e in experiment %}
+    <a class="btn btn-success {% if forloop.first %} btn-info {% endif %}" href='javascript:create_group_exp({{e.id}})'>Crear gurpo en exp <b>{{e.name}}</b></a>
+{% endfor %}
+<br>
+<br>
+<h4>Participantes seleccionados</h4>
+    <div id="selected_participants">
+
+    </div>
+
+    <br>
+    <br>
+    <h4>Participants conectados</h4>
+    <p>Nota: para actualizar el screener de los participantes tienen que refrescar esta pagina. Si quieren apagar el algoritmo que ordena usando screener agreguen el parametro get <i>cancel_sort</i> (o hagan click <a href="?cancel_sort=true">aca</a>) </p>
+
+    <div id='participants' class="" style="width:80%"></div>
+
+</div>
+
+
+    <div style="padding:40px">
+        {% if request.GET.debug %}
+        <h4>Crear grupos con participantes conectados</h4>
+        <div style='padding:10px ' class='row'>
+            <div class="form-group mb-2 col-4">
+                <h5>Elegí que experimento crear para los participantes seleccionados</h5>
+                <select class="custom-select" size="3" id='select_experiment'>
+                    {% for e in experiment %}
+                        <option value='{{ e.id }}'{% if forloop.first %} selected {% endif %}>
+                            {{ e.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <a class="btn btn-success" href='javascript:create_group()'>Crear grupo con los seleccionados</a>
+                <br>
+                <br>
+
+                <a class="btn btn-success" href='javascript:select_first_five_options()'>Seleccionar primeros 5</a>
+            </div>
+        </div>
+        {% endif %}
+
+
+
+
+    </div>
+    <script>
+
+    participants_str = {};
+    participants_checked = new Set([]);
+
+    $(update_participants)
+
+    // get update list
+    function update_participants(){
+        var jqxhr = $.get('/manager/update{% if request.GET.cancel_sort %}?cancel_sort={{request.GET.cancel_sort}}{% endif %}', function(data){
+            update_data(data);   
+            render();
+        });
+        setTimeout( update_participants, 7000);
+    }
+
+    function update_data(data){
+        participants_list = data.participants_list;
+        participants_list_key_order = []
+        participants_list.forEach(r=> participants_list_key_order.push(String(r.id)))
+        participants_list.forEach(function(r){
+            participants_str[r['id']] = r;
+        })
+    }
+
+
+    function render(){
+        var html = `
+        <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+        <thead class="thead-light">
+
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">id</th>
+                <th scope="col">nickname</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Screener</th>
+                <th scope="col">email</th>
+                <th scope="col">Last update</th>
+                <th scope="col">Grupo</th>
+                <th scope="col">Current stage</th>
+            </tr>
+        </thead>
+        <tbody>
+        `;
+        
+        //Object.keys(participants_str).forEach(function(k){
+        participants_list_key_order.forEach(function(k){
+            var has_group = participants_str[k].has_group;
+
+            var group_id = '';
+            if (has_group) group_id = participants_str[k].group_id;
+
+
+            var is_checked = '';
+            if (participants_checked.has(String(k))) is_checked = 'checked';
+            
+            var time_since_last_beacon = parseInt((new Date() - new Date(participants_str[k].last_beacon))/1000);
+
+            
+            html+= `<tr>
+                        <td>
+                            <input type='checkbox' ${is_checked} 
+                            onclick='javascript:check_input(this)' 
+                            value='${k}' 
+                            name='new_group_ids'
+                            ${(has_group)? 'disabled' : ''}
+                            />
+                        </td>
+                        <td>${k}</td>
+                        <td>${participants_str[k].nickname}</td>
+                        <td>${participants_str[k].name}</td>
+                        <td>${participants_str[k].screener_value}</td>
+                        <td>${participants_str[k].email}</td>
+                        <td>${time_since_last_beacon} seconds (${participants_str[k].last_beacon})</td>
+                        <td>${group_id}</td>
+                        <td>${participants_str[k].stage}</td>
+                    </tr>`;
+        });
+
+        html+='</tbody></table>';
+        $("#participants").html(html)
+    }
+
+ 
+    function create_group(){
+
+        var experiment_id = $("#select_experiment").val()
+
+        var arr = [];
+        $('input[name="new_group_ids"]:checked').each(function () {
+            arr.push($(this).val());
+        });
+        console.log('selected',arr)
+
+        if (arr.length < {{MIN_GROUP_SIZE}}){
+            alert('Necesitamos grupos con al menos {{MIN_GROUP_SIZE}} participantes')
+        }
+
+        if (arr.length > {{MAX_GROUP_SIZE}}){
+            alert('Necesitamos grupos con menos de {{MAX_GROUP_SIZE}} participantes')
+        }
+
+        if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){
+            $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id},function(){
+                location.reload();
+            }).fail(function() {
+                alert( "Fallo el post de crear grupos!" );
+            })
+        }
+    }
+ 
+    function create_group_exp(experiment_id){
+
+        var arr = [];
+        $('input[name="new_group_ids"]:checked').each(function () {
+            arr.push($(this).val());
+        });
+        console.log('selected',arr)
+
+        if (arr.length < {{MIN_GROUP_SIZE}}){
+            alert('Necesitamos grupos con al menos {{MIN_GROUP_SIZE}} participantes')
+        }
+
+        if (arr.length > {{MAX_GROUP_SIZE}}){
+            alert('Necesitamos grupos con menos de {{MAX_GROUP_SIZE}} participantes')
+        }
+
+        if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){
+            $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id},function(){
+                location.reload();
+            }).fail(function() {
+                alert( "Fallo el post de crear grupos!" );
+            })
+        }
+    }
+
+    function check_input(e){
+        if (e.checked) participants_checked.add(e.value);
+        else participants_checked.delete(e.value);
+    }
+
+    function select_first_five_options(){
+        $('input[name="new_group_ids"]:enabled').slice(0,5).each(function(){
+            this.checked=true;
+            check_input(this);
+        })
+    }
+
+    function select_first_n_options(n){
+        // des-selecciono todos primero
+        $('input[name="new_group_ids"]:enabled').each(function(){
+            this.checked=false;
+            participants_checked.delete(this.value);
+        })
+        $("#selected_participants").html('')
+
+        // selecciono los primeros n
+        $('input[name="new_group_ids"]:enabled').slice(0,n).each(function(){
+            this.checked=true;
+            check_input(this);
+            $("#selected_participants").append('<span>'+this.value+'</span></br>')
+
+        })
+    }
+
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
+    function select_n_random(n){
+        // des-selecciono todos primero
+        $('input[name="new_group_ids"]:enabled').each(function(){
+            this.checked=false;
+            participants_checked.delete(this.value);
+        })
+        $("#selected_participants").html('')
+        
+        range = [...Array(5).keys()]
+        participants_input = $('input[name="new_group_ids"]:enabled')
+        shuffleArray(participants_input)
+
+
+        // selecciono los primeros n
+        participants_input.slice(0,n).each(function(){
+            this.checked=true;
+            check_input(this);
+            $("#selected_participants").append('<span>'+this.value+'</span></br>')
+
+        })
+    }
+    
+    function select_best_for_moral_exp(){
+        // des-selecciono todos primero
+        $('input[name="new_group_ids"]:enabled').each(function(){
+            this.checked=false;
+            participants_checked.delete(this.value);
+        })
+        $("#selected_participants").html('')
+
+        // selecciono los primeros n
+        $('input[name="new_group_ids"]:enabled').slice(0,n).each(function(){
+            this.checked=true;
+            check_input(this);
+            $("#selected_participants").append('<span>'+this.value+'</span></br>')
+
+        })
+    }
+
+
+
+    </script>
+{% endblock %}

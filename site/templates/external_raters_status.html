@@ -1,0 +1,30 @@
+{% extends "base_external_raters.html" %}
+
+
+{% block content %}
+
+<a href="/external_raters/download_raters_data">get json data</a> <br>
+<br>
+<table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+    <thead class="thead-light">
+
+        <tr>
+            <td scope="col">rater</td>
+            <td scope="col">N_TODO</td>
+            <td scope="col">N_DONE</td>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for r in res%}
+        <tr>
+            <td>{{r.name}}</td>
+            <td>{{r.n_todo}}</td>
+            <td>{{r.n_done}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}

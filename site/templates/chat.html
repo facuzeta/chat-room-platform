@@ -1,0 +1,79 @@
+<div class='col col-sm-10 adhoc-col-sm-10' style='overflow:hidden'>
+
+    <div id="chat-log" style="text-align: left;width:100%; padding:30px;overflow: auto;height:71vh">
+    </div>
+
+    <div id='chat-inputs-box' class='chat-inputs-box'>
+        <input id="chat-message-input" placeholder='Mensaje' type="text" size="50" class="custom-select"
+            style="border-color:#0277b1;color:black; width:100%">
+
+        <input id="chat-message-submit" type="button" value="Send" style="display:none">
+
+        <div id="control_consenso" style="
+                width: 100%;
+                float: right;
+                padding-top: 8px;
+                color: #6abc3a;
+                font-weight: bold;
+        ">
+
+
+
+            <div class='control_consenso_after_ok'>
+                <div id='consensus_checkbox_div'>
+                    <input type="checkbox" id='consensus_checkbox' onchange='javascript:consensus_checkbox_change()'>
+                    <label> ¿Alcanzaron un consenso?</label>
+                </div>
+
+                <div class="modal" tabindex="-1" role="dialog" id='modal_consensus'>
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action='javascript:submit_consensus()'>
+
+                                <div class='consensus_ok' id='consensus_ok_div_container' style="width:90%;margin:auto"></div>
+                                <div class='consensus_ok' style='width:90%;margin:auto'>
+                                    <br>
+                                    <input type='submit' value="Guardar " class="btn btn-block btn-success btn-consensus-save">
+                                </div>
+                            </form>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+ 
+
+ <!-- Modal -->
+<div class="modal fade" id="modal_instructions_s2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{cms.instructions_s2_title}}
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id='modal_instructions_s2_body'>
+        {{experiment_instructions_s2|safe}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{cms.instructions_s2_button}}</button>
+      </div>
+    </div>
+  </div>
+</div> 

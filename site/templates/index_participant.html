@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+
+{% include "head.html" %}
+
+
+
+<body>
+
+
+    <div id='header-clock_and_question' class='row header' style='display: none'>
+
+        <div class='header_timmer_div_clock col col-sm-2' id='div_clock'>
+            <img src='/static/clock.png' style='height:50px' />
+            <span class='header_timmer_span current_timer'></span>
+        </div>
+
+        <div class='header_s2_trigger col col-sm-10' id='div_s2_question'>
+            <div style="margin-top:20px"> <b>{{cms.stage}} 2 </b> > {{cms.question}} <label id='stage_s2__number_question_of' class='stage_s2__number_question_of'> </label> / 4 </div>
+            <div id="stage_s2__trigger" class='question_green'></div>
+            
+        </div>
+    </div>
+
+    <div id='header-onlyclock' class='header' style='display: none'>
+
+        <div class='header_timmer_div_clock' id='div_clock' style='text-align:center'>
+            <img src='/static/clock.png' style='height:50px' />
+            <span class='header_timmer_span current_timer'></span>
+        </div>
+    </div>
+
+
+    <div id='progressbar' class='progressbar'></div>
+
+
+    <div id='content' class='main_content'>
+        <div id='step_0' class='step'>
+            {{cms.sync_server}}
+        </div>
+
+        <div id='step_ws1' style='display:none' class='step'>
+            {% include "participants_ws1.html" %}
+        </div>
+
+        <div id='step_s1' style='display:none' class='step'>
+            <div class='step_s1_and_s3_step'>
+                <div id='s1_questions'></div>
+            </div>
+        </div>
+
+
+
+        <div id='step_s2' style='display:none; ' class='step step_s2_step row'>
+
+            <div class='col col-sm-2 step_s2_and_s3_left'>
+
+                <div id='step_s2_controlls'>
+
+                    <div>
+                        <div class='step_s2_izq_title_etapa1' >{{cms.stage_s1_text}} {{cms.stage}} 1</div>
+
+                        <label class='stage_s2__answered_value' id='stage_s2__answered_value'></label>
+                        <label style='display:none' class='stage_s2__answered_value' id='stage_s2__answered_value_slash_total'>/10</label>
+
+                        <br>
+                        <div>{{cms.your_confidence}}</div>
+                        <label id='stage_s2__answered_confidence' class='stage_s2__answered_confidence'></label>
+                        <label style='color:grey'>/5</label>
+
+                    </div>
+                </div>
+
+            </div>
+            {% include "chat.html" %}
+
+        </div>
+
+
+        <div id='step_s3' style='display:none' class='step row'>
+            <div class='col col-sm-3 step_s2_and_s3_left'>
+                <div class='step_s3' style='display:none' id='step_s3_controlls'>
+
+                    <div class=" step_s3">
+                        <div style='color:grey;margin-bottom:50px;'>{{cms.stage}} 1</div>
+
+                        <div>{{cms.your_answer}}</div>
+                        <label style='font-size: 40px;' id='stage_s3__answered_value'></label>
+                        <br>
+                        <div>{{cms.your_confidence}}</div>
+                        <label id='stage_s3__answered_confidence' style='font-size: 40px;'></label>
+                        <label style='color:grey'>/5</label>
+                        <br><br><br>
+                        <div id='stage_s3__previuosly_consensus_div' style='display:none'>
+                            <div style='color:grey;margin-bottom:50px;'>{{cms.stage}} 2</div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class='col col-sm-9 step_s1_and_s3_step'>
+                <div id='s3_questions' class=''></div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal_submit_answers" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body" style="text-align: center;">
+                    {{cms.msg_wait_a_seconds_to_next_stage}}
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <img src='/static/clock.png' style='height:70px'>
+                    <br>
+                    <br>
+                    <br>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        MODAL_INSTRUCTIONS_S2_TIMEOUT = {{MODAL_INSTRUCTIONS_S2_TIMEOUT}};
+        POLLINF_FREQ_IN_MS = {{ POLLINF_FREQ_IN_MS }};
+        current_stage = null;
+        current_timer_interval = null;
+        current_timeout = null;
+
+        experiment_input_type = null;
+        experiment_has_instructions_s2 = false;
+        experiment_instructions_s2_content = "";
+
+
+        question_order = {{ question_order | safe }};
+        question_order_s2 = {{ question_order_s2 | safe }};
+        answer_dic_s1 = {};
+        answer_dic_s3 = {};
+        consensus_dic_s2 = {}
+        group_name = '{{group_name}}';
+        has_sent_s1 = false;
+        has_sent_s3 = false;
+
+        last_time_slider_change = null;
+        last_time_value_chage = null;
+        s2_question_timestamp_start = null;
+
+        chatSocket = null;
+        chatSocket_semaphore = true;
+        $(polling);
+
+
+
+        const CMS__consensus_chat = '{{cms.consensus_chat}}';
+        const CMS__trigger_to_chat = '{{cms.trigger_to_chat}}';
+        const CMS__s1_s3_complete_your_answer_placerholder = '{{cms.s1_s3_complete_your_answer_placeholder}}';
+        const CMS__question_input_confidence_class__text = '{{cms.question_input_confidence_class__text}}';
+        const CMS__stage = '{{cms.stage}}';
+        const CMS__question = '{{cms.question}}';
+        const CMS__next = '{{cms.next}}';
+        const CMS__end = '{{cms.end}}';
+        const CMS__slider_confidence_0 = '{{cms.slider_confidence_0}}';
+        const CMS__slider_confidence_1 = '{{cms.slider_confidence_1}}';
+        const CMS__slider_confidence_2 = '{{cms.slider_confidence_2}}';
+        const CMS__slider_confidence_3 = '{{cms.slider_confidence_3}}';
+        const CMS__slider_confidence_4 = '{{cms.slider_confidence_4}}';
+        const CMS__after_statement_moral = '{{cms.after_statement_moral}}';
+        const CMS__please_move_slider = '{{cms.please_move_slider}}';
+    </script>
+
+
+</body>
+
+</html>
