@@ -224,6 +224,83 @@
   }
 },
 {
+  "model": "cms.content",
+  "pk": 33,
+  "fields": {
+    "key": "stage_s1_text"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 34,
+  "fields": {
+    "key": "screenshots_intro"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 35,
+  "fields": {
+    "key": "after_statement_moral"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 36,
+  "fields": {
+    "key": "please_move_slider"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 37,
+  "fields": {
+    "key": "instructions_s2_title"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 38,
+  "fields": {
+    "key": "instructions_s2_button"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 39,
+  "fields": {
+    "key": "external_raters_question_fermi"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 40,
+  "fields": {
+    "key": "external_raters_question_number"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 41,
+  "fields": {
+    "key": "consesus_question__VALUE_AND_CONFIDENCE"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 42,
+  "fields": {
+    "key": "consesus_question__SLIDER_AGREEMENT"
+  }
+},
+{
+  "model": "cms.content",
+  "pk": 43,
+  "fields": {
+    "key": "consesus_question__EXP_INDIVIDUAL"
+  }
+},
+{
   "model": "cms.text",
   "pk": 1,
   "fields": {
@@ -274,7 +351,7 @@
   "fields": {
     "key": 5,
     "lang": "es",
-    "text": "Por favor esperá que se sumen todos los participantes."
+    "text": "En instantes empieza. Esperá a que lleguen a esta pantalla el resto de los participantes."
   }
 },
 {
@@ -283,7 +360,7 @@
   "fields": {
     "key": 6,
     "lang": "es",
-    "text": "Mientras tanto podes repasar las reglas"
+    "text": "Mientras tanto podés repasar las reglas"
   }
 },
 {
@@ -301,7 +378,7 @@
   "fields": {
     "key": 8,
     "lang": "es",
-    "text": "<p>El objetivo de esta investigación es estudiar cómo formamos nuestras opiniones y confianza sobre\r\n                    temas polémicos que nos afectan como sociedad.</p>\r\n\r\n                <p>La duración total es de unos 10 minutos, tu participación es absolutamente voluntaria y puede\r\n                    finalizar cuando lo desees. No esperamos ningún tipo de inconveniente o riesgo por participar. Los\r\n                    datos de identidad son confidenciales, están anonimizados y encriptados y serán usados\r\n                    exclusivamente para investigación.\r\n                </p>\r\n\r\n                <p>Este experimento es parte de un estudio que estamos haciendo en colaboración con el Laboratorio de\r\n                    Neurociencia de la Universidad Torcuato Di Tella. .</p>"
+    "text": "<p>El objetivo principal de esta investigación es evaluar cómo se toman decisiones sobre temas de cultura general.</p>\r\n\r\n                <p>La duración total del experimento es de entre 20 y 30 minutos. Tu participación es absolutamente voluntaria y puede finalizar cuando lo desees. No esperamos ningún tipo de inconveniente o riesgo por participar. Los datos de identidad son confidenciales, están anonimizados y encriptados y serán usados exclusivamente para investigación.\r\n                </p>\r\n\r\n                <p>Este experimento es parte de un estudio que estamos haciendo desde el Laboratorio de\r\n                    Neurociencia de la Universidad Torcuato Di Tella.</p>"
   }
 },
 {
@@ -310,7 +387,7 @@
   "fields": {
     "key": 9,
     "lang": "es",
-    "text": "<p>\r\n                    Este experimento tiene 3 etapas:\r\n                </p>\r\n\r\n                <ul>\r\n                    <li>Etapa 1: Vas a responder individualmente 8 preguntas</li>\r\n                    <li>Etapa 2: Vas a chatear con otros participantes para ponerte de acuerdo en 4 preguntas</li>\r\n                    <li>Etapa 3: Vas a responder nuevamente las mismas 8 preguntas</li>\r\n                </ul>\r\n                <p>Cada etapa tiene un tiempo máximo para responderla, tras pasar ese tiempo se redirigirá\r\n                    automáticamente a la siguiente etapa.</p>"
+    "text": "<p>\r\nExperimento de estimación:\r\n</p>\r\n<ul>\r\n<li><b>Etapa 1</b>: Te van a aparecer 8 preguntas de estimación en pantalla, y podrás colocar el valor que pensás que corresponde. Además tendrás que elegir qué tanto confías en tu respuesta (en una escala de nada a mucho).</li><br>\r\n<li><b>Etapa 2</b>: Te van a aparecer 4 de las 8 preguntas de la Etapa 1. Para responderlas te pedimos que sigas las instrucciones del video que aparece al inicio de esta etapa (acordarse de activar el sonido).</li><br>\r\n<li><b>Etapa 3</b>: Igual a etapa 1.</li>\r\n</ul>\r\n<br>"
   }
 },
 {
@@ -355,7 +432,7 @@
   "fields": {
     "key": 14,
     "lang": "es",
-    "text": "En instantes vas a pasar a la siguiente etapa."
+    "text": "En instantes vas a pasar a la siguiente etapa. Esperá a que terminen los otros participantes."
   }
 },
 {
@@ -382,7 +459,7 @@
   "fields": {
     "key": 17,
     "lang": "es",
-    "text": "Nueva pregunta para discutir:"
+    "text": "Nueva pregunta:"
   }
 },
 {
@@ -481,7 +558,7 @@
   "fields": {
     "key": 28,
     "lang": "es",
-    "text": "¡Gracias por tu participación!"
+    "text": "Gracias por participar"
   }
 },
 {
@@ -521,6 +598,105 @@
   }
 },
 {
+  "model": "cms.text",
+  "pk": 34,
+  "fields": {
+    "key": 33,
+    "lang": "es",
+    "text": "Tu respuesta a esta pregunta en la"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 35,
+  "fields": {
+    "key": 34,
+    "lang": "es",
+    "text": "Así es la interfaz de la etapa 2. No te olvides de mandar el consenso antes de que termine el tiempo!"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 36,
+  "fields": {
+    "key": 35,
+    "lang": "es",
+    "text": "¿Cuán de acuerdo estas con la frase anterior?"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 37,
+  "fields": {
+    "key": 36,
+    "lang": "es",
+    "text": "Por favor hacé click en la barra de abajo y elegí tu nivel de acuerdo."
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 38,
+  "fields": {
+    "key": 37,
+    "lang": "es",
+    "text": "Instrucciones"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 39,
+  "fields": {
+    "key": 38,
+    "lang": "es",
+    "text": "OK"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 40,
+  "fields": {
+    "key": 39,
+    "lang": "es",
+    "text": "1 - They reached agreement by doing calculations and/or breaking down the problem into smaller estimation problems. ( 0 - Completamente ausente, 5- Un poco presente, 10- Completamente presente )"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 41,
+  "fields": {
+    "key": 40,
+    "lang": "es",
+    "text": "2 - They reached an agreement using their individual answers, either by averaging or any other combination procedure. ( 0 - Completamente ausente, 5- Un poco presente, 10- Completamente presente)"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 42,
+  "fields": {
+    "key": 41,
+    "lang": "es",
+    "text": "¿Alcanzaron un consenso?"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 43,
+  "fields": {
+    "key": 42,
+    "lang": "es",
+    "text": "¿Alcanzaron un consenso?"
+  }
+},
+{
+  "model": "cms.text",
+  "pk": 44,
+  "fields": {
+    "key": 43,
+    "lang": "es",
+    "text": "Tildá aquí para completar el valor"
+  }
+},
+{
   "model": "cms.config",
   "pk": "MAX_GROUP_SIZE",
   "fields": {
@@ -546,6 +722,20 @@
   "pk": "MIN_GROUP_SIZE",
   "fields": {
     "value": "1"
+  }
+},
+{
+  "model": "cms.config",
+  "pk": "MODAL_INSTRUCTIONS_S2_TIMEOUT",
+  "fields": {
+    "value": "65000"
+  }
+},
+{
+  "model": "cms.config",
+  "pk": "MODAL_PRIMER_S2_TIMEOUT",
+  "fields": {
+    "value": "90000"
   }
 },
 {

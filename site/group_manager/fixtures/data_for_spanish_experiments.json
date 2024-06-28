@@ -1,0 +1,796 @@
+[
+{
+  "model": "group_manager.stage",
+  "pk": 1,
+  "fields": {
+    "name": "ws1",
+    "label": "ws1"
+  }
+},
+{
+  "model": "group_manager.stage",
+  "pk": 2,
+  "fields": {
+    "name": "s1",
+    "label": "Etapa 1"
+  }
+},
+{
+  "model": "group_manager.stage",
+  "pk": 3,
+  "fields": {
+    "name": "s2_1",
+    "label": "Etapa 2 - pregunta 1"
+  }
+},
+{
+  "model": "group_manager.stage",
+  "pk": 4,
+  "fields": {
+    "name": "s2_2",
+    "label": "Etapa 2 - pregunta 2"
+  }
+},
+{
+  "model": "group_manager.stage",
+  "pk": 5,
+  "fields": {
+    "name": "s2_3",
+    "label": "Etapa 2 - pregunta 3"
+  }
+},
+{
+  "model": "group_manager.stage",
+  "pk": 6,
+  "fields": {
+    "name": "s2_4",
+    "label": "Etapa 2 - pregunta 4"
+  }
+},
+{
+  "model": "group_manager.stage",
+  "pk": 7,
+  "fields": {
+    "name": "s3",
+    "label": "Etapa 3"
+  }
+},
+{
+  "model": "group_manager.stage",
+  "pk": 8,
+  "fields": {
+    "name": "thanks",
+    "label": "thanks"
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 1,
+  "fields": {
+    "stage": 1,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 2,
+  "fields": {
+    "stage": 8,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 3,
+  "fields": {
+    "stage": 2,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 4,
+  "fields": {
+    "stage": 4,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 5,
+  "fields": {
+    "stage": 5,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 6,
+  "fields": {
+    "stage": 6,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 7,
+  "fields": {
+    "stage": 7,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 8,
+  "fields": {
+    "stage": 3,
+    "experiment": 1,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 9,
+  "fields": {
+    "stage": 1,
+    "experiment": 2,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 10,
+  "fields": {
+    "stage": 8,
+    "experiment": 2,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 11,
+  "fields": {
+    "stage": 2,
+    "experiment": 2,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 12,
+  "fields": {
+    "stage": 4,
+    "experiment": 2,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 13,
+  "fields": {
+    "stage": 5,
+    "experiment": 2,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 14,
+  "fields": {
+    "stage": 6,
+    "experiment": 2,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 15,
+  "fields": {
+    "stage": 7,
+    "experiment": 2,
+    "timeout_in_seconds": 301
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 16,
+  "fields": {
+    "stage": 3,
+    "experiment": 2,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 17,
+  "fields": {
+    "stage": 1,
+    "experiment": 3,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 18,
+  "fields": {
+    "stage": 8,
+    "experiment": 3,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 19,
+  "fields": {
+    "stage": 2,
+    "experiment": 3,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 20,
+  "fields": {
+    "stage": 4,
+    "experiment": 3,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 21,
+  "fields": {
+    "stage": 5,
+    "experiment": 3,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 22,
+  "fields": {
+    "stage": 6,
+    "experiment": 3,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 23,
+  "fields": {
+    "stage": 7,
+    "experiment": 3,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 24,
+  "fields": {
+    "stage": 3,
+    "experiment": 3,
+    "timeout_in_seconds": 365
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 25,
+  "fields": {
+    "stage": 1,
+    "experiment": 4,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 26,
+  "fields": {
+    "stage": 8,
+    "experiment": 4,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 27,
+  "fields": {
+    "stage": 2,
+    "experiment": 4,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 28,
+  "fields": {
+    "stage": 4,
+    "experiment": 4,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 29,
+  "fields": {
+    "stage": 5,
+    "experiment": 4,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 30,
+  "fields": {
+    "stage": 6,
+    "experiment": 4,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 31,
+  "fields": {
+    "stage": 7,
+    "experiment": 4,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 32,
+  "fields": {
+    "stage": 3,
+    "experiment": 4,
+    "timeout_in_seconds": 400
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 33,
+  "fields": {
+    "stage": 1,
+    "experiment": 5,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 34,
+  "fields": {
+    "stage": 8,
+    "experiment": 5,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 35,
+  "fields": {
+    "stage": 2,
+    "experiment": 5,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 36,
+  "fields": {
+    "stage": 4,
+    "experiment": 5,
+    "timeout_in_seconds": 180
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 37,
+  "fields": {
+    "stage": 5,
+    "experiment": 5,
+    "timeout_in_seconds": 180
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 38,
+  "fields": {
+    "stage": 6,
+    "experiment": 5,
+    "timeout_in_seconds": 180
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 39,
+  "fields": {
+    "stage": 7,
+    "experiment": 5,
+    "timeout_in_seconds": 300
+  }
+},
+{
+  "model": "group_manager.stagetimes",
+  "pk": 40,
+  "fields": {
+    "stage": 3,
+    "experiment": 5,
+    "timeout_in_seconds": 280
+  }
+},
+{
+  "model": "group_manager.experiment",
+  "pk": 1,
+  "fields": {
+    "name": "exp1_factico",
+    "input_type": "VALUE_AND_CONFIDENCE",
+    "instructions_s2": ""
+  }
+},
+{
+  "model": "group_manager.experiment",
+  "pk": 2,
+  "fields": {
+    "name": "exp_moral",
+    "input_type": "SLIDER_AGREEMENT",
+    "instructions_s2": ""
+  }
+},
+{
+  "model": "group_manager.experiment",
+  "pk": 3,
+  "fields": {
+    "name": "exp_instrucciones_numeros",
+    "input_type": "VALUE_AND_CONFIDENCE",
+    "instructions_s2": "<iframe width=\"699\" height=\"393\" src=\"https://www.youtube.com/embed/8VAuRjo882M\" title=\"numeros version1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>"
+  }
+},
+{
+  "model": "group_manager.experiment",
+  "pk": 4,
+  "fields": {
+    "name": "exp-GRUPAL-FERMI",
+    "input_type": "VALUE_AND_CONFIDENCE",
+    "instructions_s2": "<iframe width=\"699\" height=\"393\" src=\"https://www.youtube.com/embed/yxIAn5hLsoY\" title=\"FERMI version1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>"
+  }
+},
+{
+  "model": "group_manager.experiment",
+  "pk": 5,
+  "fields": {
+    "name": "Exp-INDIVIDUAL-FERMI",
+    "input_type": "EXP_INDIVIDUAL",
+    "instructions_s2": "<iframe width=\"699\" height=\"393\" src=\"https://www.youtube.com/embed/vZjsettG2RA\" title=\"FERMI version1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>"
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 1,
+  "fields": {
+    "text": "¿Cuántos goles se anotaron en total en el mundial Brasil 2014?",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 2,
+  "fields": {
+    "text": "¿Cuántos escalones tiene la escalera interna del obelisco?",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 3,
+  "fields": {
+    "text": "¿Cuántas personas (en MILLONES) viven en América del Sur?",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 4,
+  "fields": {
+    "text": "¿Cuál es la longitud en metros del recorrido total de la línea A? (subte de CABA)",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 5,
+  "fields": {
+    "text": "Hasta 2021, ¿en cuántas finales de la Copa Libertadores participó un equipo argentino?",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 6,
+  "fields": {
+    "text": "¿Cuántos Kilos de helado come por año una persona en Argentina?",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 7,
+  "fields": {
+    "text": "¿Cuántos capítulos tiene la serie estadounidense de televisión \"Friends\"?",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 8,
+  "fields": {
+    "text": "¿Cuántos países tienen territorio en el hemisferio sur, excluyendo el continente antártico?",
+    "experiment": 1
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 9,
+  "fields": {
+    "text": "La oferta y demanda de trabajo sexual deberia ser legal",
+    "experiment": 2
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 10,
+  "fields": {
+    "text": "No debería existir ningún límite a la libertad de expresión",
+    "experiment": 2
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 11,
+  "fields": {
+    "text": "La subrogación de vientres para tener hijos debería ser legal",
+    "experiment": 2
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 12,
+  "fields": {
+    "text": "Todas las personas deberían ser vegetarianas",
+    "experiment": 2
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 13,
+  "fields": {
+    "text": "Debería permitirse la edición genética en humanos con el fin de evitar enfermedades",
+    "experiment": 2
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 14,
+  "fields": {
+    "text": "De ser científicamente posible, las personas deberían ser inmortales.",
+    "experiment": 2
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 15,
+  "fields": {
+    "text": "¿Cuántos países tienen territorio en el hemisferio sur, excluyendo el continente antártico?",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 16,
+  "fields": {
+    "text": "¿Cuántos capítulos tiene la serie estadounidense de televisión \"Friends\"?",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 17,
+  "fields": {
+    "text": "¿Cuántos Kilos de helado come por año una persona en Argentina?",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 18,
+  "fields": {
+    "text": "Hasta 2021, ¿en cuántas finales de la Copa Libertadores participó un equipo argentino?",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 19,
+  "fields": {
+    "text": "¿Cuál es la longitud en metros del recorrido total de la línea A? (subte de CABA)",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 20,
+  "fields": {
+    "text": "¿Cuántas personas (en MILLONES) viven en América del Sur?",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 21,
+  "fields": {
+    "text": "¿Cuántos escalones tiene la escalera interna del obelisco?",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 22,
+  "fields": {
+    "text": "¿Cuántos goles se anotaron en total en el mundial Brasil 2014?",
+    "experiment": 3
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 23,
+  "fields": {
+    "text": "¿Cuántos goles se anotaron en total en el mundial Brasil 2014?",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 24,
+  "fields": {
+    "text": "¿Cuántos escalones tiene la escalera interna del obelisco?",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 25,
+  "fields": {
+    "text": "¿Cuántas personas (en MILLONES) viven en América del Sur?",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 26,
+  "fields": {
+    "text": "¿Cuál es la longitud en metros del recorrido total de la línea A? (subte de CABA)",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 27,
+  "fields": {
+    "text": "Hasta 2021, ¿en cuántas finales de la Copa Libertadores participó un equipo argentino?",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 28,
+  "fields": {
+    "text": "¿Cuántos Kilos de helado come por año una persona en Argentina?",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 29,
+  "fields": {
+    "text": "¿Cuántos capítulos tiene la serie estadounidense de televisión \"Friends\"?",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 30,
+  "fields": {
+    "text": "¿Cuántos países tienen territorio en el hemisferio sur, excluyendo el continente antártico?",
+    "experiment": 4
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 31,
+  "fields": {
+    "text": "¿Cuántos goles se anotaron en total en el mundial Brasil 2014?",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 32,
+  "fields": {
+    "text": "¿Cuántos escalones tiene la escalera interna del obelisco?",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 33,
+  "fields": {
+    "text": "¿Cuántas personas (en MILLONES) viven en América del Sur?",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 34,
+  "fields": {
+    "text": "¿Cuál es la longitud en metros del recorrido total de la línea A? (subte de CABA)",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 35,
+  "fields": {
+    "text": "Hasta 2021, ¿en cuántas finales de la Copa Libertadores participó un equipo argentino?",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 36,
+  "fields": {
+    "text": "¿Cuántos Kilos de helado come por año una persona en Argentina?",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 37,
+  "fields": {
+    "text": "¿Cuántos capítulos tiene la serie estadounidense de televisión “Friends”?",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.question",
+  "pk": 38,
+  "fields": {
+    "text": "¿Cuántos países tienen territorio en el hemisferio sur, excluyendo el continente antártico?",
+    "experiment": 5
+  }
+},
+{
+  "model": "group_manager.chatexpertevaluationquestion",
+  "pk": 7,
+  "fields": {
+    "text": "1 - They reached agreement by doing calculations and/or breaking down the problem into smaller estimation problems.  ( 0 - No usaron esta estrategia, 5- No se si la usaron, 10- Usaron completamente esta estrategia)"
+  }
+},
+{
+  "model": "group_manager.chatexpertevaluationquestion",
+  "pk": 8,
+  "fields": {
+    "text": "2 - They reached an agreement using their individual answers, either by averaging or any other combination procedure. ( 0 - No usaron esta estrategia, 5- No se si la usaron, 10- Usaron completamente esta estrategia)"
+  }
+},
+{
+  "model": "group_manager.chatexpertevaluationquestion",
+  "pk": 9,
+  "fields": {
+    "text": "3 - ¿Creés que alguien dominó la conversación? (0 - No, 5 - No se, 10 - Sí)"
+  }
+}
+]
