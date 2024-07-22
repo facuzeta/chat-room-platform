@@ -5,6 +5,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import group_manager.models
 from channels.db import database_sync_to_async
 
+import bot.models
+import httpx
+import asyncio
 
 async def connect(self):
     self.username = await self.get_name()
@@ -29,6 +32,12 @@ def get_nickname_and_color(user):
     nickname = participant.get_nickname()
     color = participant.get_color()
     return nickname, color
+
+@database_sync_to_async
+def get_bot(behaviour_nickname):
+    current_bot = bot.models.Bot.objects.get(behaviour_nickname="repeat")
+    return current_bot
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -60,8 +69,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print('recieve', stage_name, message)
 
         await store_chat(self.user, stage_name, message)
-        nickname, color = await get_nickname_and_color(self.user)
-
+        nickname, color = await get_nickname_and_color(self.user)  
+                  
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -73,7 +82,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'user_id':self.user.id
                 # 'user': self.user.username+'('+str(self.user.id)+')'
             }
-        )
+        )   
+
+        #Esto debería hacerlo solo si esta habilitado el chat con bot
+        asyncio.create_task(self.send_to_bot(message))   
+        
+        
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -81,14 +95,54 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = event['user']
         color = event['color']
         user_id = event['user_id']
-        own_msg = user_id == self.user.id
+        own_msg = user_id == self.user.id        
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'user': user,
             'color': color,
             'own_msg': own_msg
-        }))
+        }))       
+        
+        
+    async def send_to_bot(self,message):    
+        
+        client =httpx.AsyncClient()
+        #Responde el bot mockup
+        current_bot = await get_bot("repeat")
+        url= "http://127.0.0.1:8000/api/bots/"+ str(current_bot.id) +"/"       
+        data = {"prompt" : message}
+
+        #Prueba con ollama
+        # url = 'http://127.0.0.1:11434/api/generate'
+        # data = {    
+        # "model": "llama3",
+        # "prompt": message,    
+        # "stream": False
+        # }
+        response = await client.post(url,json=data)
+        
+        print(response)
+        print(response.json())   
+        
+        #Hay que revisar como guardar el chat,
+        #   Modificar models.chat para que pueda almacenar tanto bot como participante?
+        #   Crear un model de respuestas de bot que relacione mensaje de chat de participante con respuesta de bot?
+        #await store_chat(1, stage_name, message)
+
+        await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': response.json()['response'],
+                    'user': current_bot.behaviour_nickname,
+                    'color': '#000000',
+                    'user_id': current_bot.id
+                    # 'user': self.user.username+'('+str(self.user.id)+')'
+                }
+            )  
+
+        
 
 
 class ChatConsumerForTest(AsyncWebsocketConsumer):

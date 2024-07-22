@@ -86,7 +86,7 @@ def create_group(list_of_participants, experiment_id=1):
             print(f'create_group: participant {participant.id} no estaba en first_stage')
         assert(participant.get_current_stage() == Stage.get_first_stage())
 
-    group = Group.objects.create(name=get_random_string(), experiment=experiment)
+    group = Group.objects.create(name=get_random_string(length=32), experiment=experiment)
 
     for participant in list_of_participants:
         transition_ws1_s1(participant)
@@ -128,7 +128,7 @@ def send_invitation_email(participant, timestamp_experiment):
                                      'email_invitation.html')
     template = get_template(template_filename)
     html = template.render(context)
-
+    print(html)
     datetime_subject = str(timestamp_experiment.astimezone()).split('.')[0][:-3]
     send_mail(f'Invitación {datetime_subject}', '', f'Invitación Experimento<{settings.EMAIL}>', [email], html_message=html)
 
