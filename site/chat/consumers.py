@@ -5,6 +5,11 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import group_manager.models
 from channels.db import database_sync_to_async
 
+import bot.models
+import httpx
+import asyncio
+
+import os
 
 async def connect(self):
     self.username = await self.get_name()
@@ -14,9 +19,16 @@ def get_name(self):
     return User.objects.all()[0].name
 
 @database_sync_to_async
-def store_chat(user, stage_name, message):
-    print('store_chat',user, stage_name, message)
-    participant = group_manager.models.Participant.objects.get(user=user)
+def store_chat(user, stage_name, message, is_bot = False):
+    print('store_chat',user, stage_name, message) 
+
+    #If it has to store a bot message, the user is the bot participant,
+    #   else it is the user and has to get the participant
+    if is_bot:
+        participant = user
+    else:
+        participant = group_manager.models.Participant.objects.get(user=user) 
+
     print(group_manager.models.Participant)
     print(group_manager.models.Stage)
     stage = group_manager.models.Stage.objects.get(name=stage_name)
@@ -29,6 +41,18 @@ def get_nickname_and_color(user):
     nickname = participant.get_nickname()
     color = participant.get_color()
     return nickname, color
+
+@database_sync_to_async
+def get_all_bots_in_same_group(user):    
+    participant = group_manager.models.Participant.objects.get(user=user)    
+    participant_bots_in_group = [p for p in participant.group.participants.all() if p.is_bot()]
+    print(participant_bots_in_group)
+    return participant_bots_in_group
+
+@database_sync_to_async
+def get_bot(behaviour_nickname):
+    current_bot = bot.models.Bot.objects.get(behaviour_nickname="repeat")
+    return current_bot
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -60,8 +84,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print('recieve', stage_name, message)
 
         await store_chat(self.user, stage_name, message)
-        nickname, color = await get_nickname_and_color(self.user)
-
+        nickname, color = await get_nickname_and_color(self.user)  
+                  
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -73,7 +97,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'user_id':self.user.id
                 # 'user': self.user.username+'('+str(self.user.id)+')'
             }
-        )
+        )  
+        #This will make the bots in the same group, if there are any, reply
+        asyncio.create_task(self.send_to_bots(message,stage_name))   
+        
+        
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -81,15 +109,46 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = event['user']
         color = event['color']
         user_id = event['user_id']
-        own_msg = user_id == self.user.id
+        own_msg = user_id == self.user.id        
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'user': user,
             'color': color,
             'own_msg': own_msg
-        }))
+        }))       
+        
+        
+    async def send_to_bots(self,message,stage_name):            
+        auth = httpx.BasicAuth(username=os.environ["BOT_USER"], password=os.environ["BOT_PASSWORD"])
+        client =httpx.AsyncClient()        
+        bots_in_group = await get_all_bots_in_same_group(self.user)
+        for b in bots_in_group:
+            bot_template = b.bot
+            behaviour = bot_template.behaviour_nickname
+            current_bot = await get_bot(behaviour)  
+            url= "http://127.0.0.1:8000/api/bots/"+ str(current_bot.id) +"/"  
+            #We probably will need to get all the chat from the group to send to the bot
+            # And the particiant id so he knows which messages he sent himself
+            data = { 'prompt' : message}     
+            response = await client.post(url,json=data,auth=auth)   
+            bot_response =  response.json()['response']   
+            print(response)
+            print(response.json())   
 
+            await store_chat(b, stage_name, bot_response, is_bot= True)
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': response.json()['response'],
+                    'user': current_bot.behaviour_nickname,
+                    'color': '#000000',
+                    'user_id': current_bot.id
+                    # 'user': self.user.username+'('+str(self.user.id)+')'
+                }
+            ) 
 
 class ChatConsumerForTest(AsyncWebsocketConsumer):
     async def connect(self):

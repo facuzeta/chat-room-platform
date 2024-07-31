@@ -4,16 +4,23 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from dateutil.parser import parse
 from cms.models import Config
-
 COLORS = ['#D81B60', '#1E88E5', '#FFC107', '#2ebda5']
 
 
 class Participant(models.Model):
+
+    #If a participant is a real person, it is linked to the AUTH_USER_MODEL
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
-    hash = models.CharField(max_length=12, default=get_random_string)
+    
+    #If a participant is a bot, it is linked to the bot model
+    bot = models.ForeignKey('bot.Bot', null=True, blank=True, on_delete=models.CASCADE)
+
+    hash = models.CharField(max_length=12, default=get_random_string(length=32))
     group = models.ForeignKey(
         'Group', null=True, blank=True, on_delete=models.SET_NULL, related_name='participants')
 
@@ -28,7 +35,10 @@ class Participant(models.Model):
     nickname = models.CharField(max_length=128, null=True, blank=True)
     
     screener_value = models.FloatField(default=-1)
-    
+
+    def is_bot(self):
+        return not(self.bot is None)
+        
     def get_nickname(self):
         if (self.nickname is None) or len(self.nickname) < 2:
             return self.user.username

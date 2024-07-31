@@ -1,0 +1,12 @@
+[
+{
+  "model": "bot.bot",
+  "pk": 1,
+  "fields": {
+    "system_prompt": "repeat",
+    "reply_probability": 0.5,
+    "behaviour_nickname": "repeat",
+    "llmodel": "mockup"
+  }
+}
+]

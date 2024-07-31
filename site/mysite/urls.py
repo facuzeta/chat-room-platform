@@ -43,7 +43,9 @@ urlpatterns = [
     path('manager/export_all', export_all),
     path('manager/expert_valuation', save_expert_valuation, name='save_expert_valuation'),
 
-    path('external_raters/', include('external_raters.urls'))
+    path('external_raters/', include('external_raters.urls')),
+
+    path('api/', include('bot.api.urls'))
 
 ]
 
