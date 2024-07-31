@@ -154,5 +154,5 @@ def thanks(request):
 
 def info(request):
     context = {}
-    context["cms"] = get_cms()    
+    context["cms"] = get_cms()
     return render(request, "info.html", context)
