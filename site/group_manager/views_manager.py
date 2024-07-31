@@ -18,6 +18,7 @@ from group_manager.views import get_cms
 from django.contrib.admin.views.decorators import staff_member_required
 import dateutil.parser
 from django.contrib.auth import get_user_model
+from bot.models import *
 
 
 @staff_member_required
@@ -201,12 +202,21 @@ def create_group_view(request):
     if not request.user.is_staff:
         raise PermissionDenied
 
-    participants_ids_list = request.POST.getlist('participants_ids_list[]', [])
+    participants_ids_list = request.POST.getlist('participants_ids_list[]', [])    
     experiment_id = request.POST.get('experiment_id', 1)
+    
+    #In this way we create a bot participant each time a new group
+    # We could add more options in the manager.html to configure there which bots are created/added to a group
+    print("creating new bot")
+    bot_template = Bot.objects.get(behaviour_nickname= "repeat")
+    new_bot = Participant(bot = bot_template)      
+    new_bot.save()
+    bot_stage=StageParticipant(participant=new_bot,stage= Stage.get_first_stage()) 
+    bot_stage.save()
 
     print('create_group_view', participants_ids_list)
-    create_group([Participant.objects.get(id=int(e)) for e in participants_ids_list], experiment_id)
-
+    create_group([Participant.objects.get(id=int(e)) for e in participants_ids_list] + [new_bot], experiment_id)
+    
     return JsonResponse({})
 
 def create_expert_answers_with_valuation(user, group):
