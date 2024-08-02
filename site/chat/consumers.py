@@ -51,7 +51,7 @@ def get_all_bots_in_same_group(user):
 
 @database_sync_to_async
 def get_bot(behaviour_nickname):
-    current_bot = bot.models.Bot.objects.get(behaviour_nickname="repeat")
+    current_bot = bot.models.Bot.objects.get(behaviour_nickname=behaviour_nickname)
     return current_bot
 
 class ChatConsumer(AsyncWebsocketConsumer):

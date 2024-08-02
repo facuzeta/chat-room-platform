@@ -33,8 +33,13 @@ def bot_detail(request, pk):
         serializer = BotSerializer(bot)
         return Response(serializer.data)   
     
-    elif request.method == 'POST':  
-        input_chat = str(request.data.get("prompt"))
-        #Here goes the bot processing of the prompt
-        return Response({"response": input_chat + input_chat, "made_by": bot.behaviour_nickname},status = status.HTTP_200_OK)
+    elif request.method == 'POST': 
+        #Here we process the prompt received
+        input_chat = str(request.data.get("prompt"))    
+        if(bot.behaviour_nickname == "repeat"):
+            return Response({"response": input_chat + input_chat, "made_by": bot.behaviour_nickname},status = status.HTTP_200_OK)
+        elif (bot.behaviour_nickname == "hello"):
+            return Response({"response": "hello", "made_by": bot.behaviour_nickname},status = status.HTTP_200_OK)
+        
+        
     

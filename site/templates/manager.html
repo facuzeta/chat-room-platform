@@ -18,6 +18,26 @@
 {% endfor %}
 <br>
 <br>
+<h4> Agregar bots</h4>
+<div class="select-container" style="display: flex;">
+    {% for n in bot_n%}
+    <div class="select-bot">
+        <h5> Bot {{n}}</h5>
+        <select id = "select_bot{{n}}">
+            <option value="">Desactivado</option>
+            {% for b in bot %}
+            <option value={{b.behaviour_nickname}}>{{b.behaviour_nickname}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    {% endfor %}   
+</div>
+
+
+
+<br>
+<br>
 <h4>Participantes seleccionados</h4>
     <div id="selected_participants">
 
@@ -163,7 +183,7 @@
         }
 
         if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){
-            $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id},function(){
+            $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id },function(){
                 location.reload();
             }).fail(function() {
                 alert( "Fallo el post de crear grupos!" );
@@ -172,7 +192,14 @@
     }
  
     function create_group_exp(experiment_id){
-
+        var bot_list = [];
+        for (let i = 1; i < 5; i++) {
+            var selected_bot = "#select_bot" + i;
+            var bot_nick = $(selected_bot).val();            
+            if ( bot_nick != ""){
+                bot_list.push(bot_nick);
+            }       
+        }      
         var arr = [];
         $('input[name="new_group_ids"]:checked').each(function () {
             arr.push($(this).val());
@@ -188,7 +215,7 @@
         }
 
         if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){
-            $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id},function(){
+            $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id,'bot_list':bot_list},function(){
                 location.reload();
             }).fail(function() {
                 alert( "Fallo el post de crear grupos!" );
