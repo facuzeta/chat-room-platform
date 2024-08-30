@@ -4,12 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 # from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http  
 import group_manager.models
 from channels.db import database_sync_to_async
-
 import bot.models
-import httpx
-import asyncio
-
-import os
 
 async def connect(self):
     self.username = await self.get_name()
@@ -19,16 +14,9 @@ def get_name(self):
     return User.objects.all()[0].name
 
 @database_sync_to_async
-def store_chat(user, stage_name, message, is_bot = False):
-    print('store_chat',user, stage_name, message) 
-
-    #If it has to store a bot message, the user is the bot participant,
-    #   else it is the user and has to get the participant
-    if is_bot:
-        participant = user
-    else:
-        participant = group_manager.models.Participant.objects.get(user=user) 
-
+def store_chat(user, stage_name, message):
+    print('store_chat',user, stage_name, message)
+    participant = group_manager.models.Participant.objects.get(user=user)
     print(group_manager.models.Participant)
     print(group_manager.models.Stage)
     stage = group_manager.models.Stage.objects.get(name=stage_name)
@@ -94,12 +82,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'user': nickname,
                 'color': color,
-                'user_id':self.user.id
+                'user_id':self.user.id,
+                'is_bot':False
                 # 'user': self.user.username+'('+str(self.user.id)+')'
             }
-        )  
-        #This will make the bots in the same group, if there are any, reply
-        asyncio.create_task(self.send_to_bots(message,stage_name))   
+        ) 
         
         
 
@@ -109,46 +96,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = event['user']
         color = event['color']
         user_id = event['user_id']
-        own_msg = user_id == self.user.id        
+        bot_msg = event['is_bot']
+        own_msg = (user_id == self.user.id and not(bot_msg))        
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'user': user,
             'color': color,
             'own_msg': own_msg
-        }))       
-        
-        
-    async def send_to_bots(self,message,stage_name):            
-        auth = httpx.BasicAuth(username=os.environ["BOT_USER"], password=os.environ["BOT_PASSWORD"])
-        client =httpx.AsyncClient()        
-        bots_in_group = await get_all_bots_in_same_group(self.user)
-        for b in bots_in_group:
-            bot_template = b.bot
-            behaviour = bot_template.behaviour_nickname
-            current_bot = await get_bot(behaviour)  
-            url= "http://127.0.0.1:8000/api/bots/"+ str(current_bot.id) +"/"  
-            #We probably will need to get all the chat from the group to send to the bot
-            # And the particiant id so he knows which messages he sent himself
-            data = { 'prompt' : message}     
-            response = await client.post(url,json=data,auth=auth)   
-            bot_response =  response.json()['response']   
-            print(response)
-            print(response.json())   
-
-            await store_chat(b, stage_name, bot_response, is_bot= True)
-
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message': response.json()['response'],
-                    'user': current_bot.behaviour_nickname,
-                    'color': '#000000',
-                    'user_id': current_bot.id
-                    # 'user': self.user.username+'('+str(self.user.id)+')'
-                }
-            ) 
+        }))
 
 class ChatConsumerForTest(AsyncWebsocketConsumer):
     async def connect(self):
@@ -178,7 +134,7 @@ class ChatConsumerForTest(AsyncWebsocketConsumer):
         stage_name = text_data_json['stage_name']
         # timestamp = text_data_json['timestamp']
         print('recieve', stage_name, message)
-
+        
 
         # Send message to room group
         await self.channel_layer.group_send(

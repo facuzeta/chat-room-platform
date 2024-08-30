@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'cms',
     'external_raters',
-    'rest_framework',
     'bot'
 ]
 
@@ -73,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'

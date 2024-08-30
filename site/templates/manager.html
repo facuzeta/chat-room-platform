@@ -214,12 +214,21 @@
             alert('Necesitamos grupos con menos de {{MAX_GROUP_SIZE}} participantes')
         }
 
-        if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){
+        if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){            
             $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id,'bot_list':bot_list},function(){
                 location.reload();
-            }).fail(function() {
+            }).done(function(response) {
+                if(bot_list.length !== 0){
+                    const params = new URLSearchParams({
+                    group_id: response.group_id,                
+                    });
+                    window.open("{% url 'run_bots' %}?" + params.toString(), '_blank');
+
+                }
+                
+                }).fail(function() {
                 alert( "Fallo el post de crear grupos!" );
-            })
+            })            
         }
     }
 
