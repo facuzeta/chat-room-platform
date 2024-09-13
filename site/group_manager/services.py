@@ -138,10 +138,15 @@ def create_bots_participants(bots_n):
         print("creating new bot of type: " + b )
         bot_template = Bot.objects.get(behaviour_nickname= b)  
         #name selection      
-        random_name = random.choice(nombres)       
-        nombres.remove(random_name)     
-
-        new_bot = Participant(bot = bot_template, nickname = random_name)      
+        if bot_template.use_random_nickname:
+            name = random.choice(nombres)       
+            nombres.remove(name)
+        elif not bot_template.chatroom_nickname:
+            name = bot_template.behaviour_nickname
+        else:
+            name = bot_template.chatroom_nickname
+            
+        new_bot = Participant(bot = bot_template, nickname = name)      
         new_bot.save()
         bot_stage=StageParticipant(participant=new_bot,stage= Stage.get_first_stage()) 
         bot_stage.save()
