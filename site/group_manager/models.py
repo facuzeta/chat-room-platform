@@ -1,19 +1,27 @@
+from simple_history.models import HistoricalRecords
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from dateutil.parser import parse
 from cms.models import Config
-
+import group_manager.models
 COLORS = ['#D81B60', '#1E88E5', '#FFC107', '#2ebda5']
 
-
 class Participant(models.Model):
+
+    #If a participant is a real person, it is linked to the AUTH_USER_MODEL
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
-    hash = models.CharField(max_length=12, default=get_random_string)
+    
+    #If a participant is a bot, it is linked to the bot model
+    bot = models.ForeignKey('bot.Bot', null=True, blank=True, on_delete=models.CASCADE)
+
+    hash = models.CharField(max_length=12, default=get_random_string(length=32))
     group = models.ForeignKey(
         'Group', null=True, blank=True, on_delete=models.SET_NULL, related_name='participants')
 
@@ -28,7 +36,43 @@ class Participant(models.Model):
     nickname = models.CharField(max_length=128, null=True, blank=True)
     
     screener_value = models.FloatField(default=-1)
+
+    def is_bot(self):
+
+        return not(self.bot is None)  
     
+    def get_questions_order(self):
+        return  self.group.question_order_s2
+    
+    def get_remaining_time(self):               
+        #For stage time we check the timestart of a user, because bots update stages when they poll only
+        participants_in_group = [p for p in group_manager.models.Participant.objects.filter(group=self.group) if not(p.is_bot())]
+        return (participants_in_group[0].get_current_stage_timeout() - timezone.now()).total_seconds()
+
+    def get_chat_history(self):
+        group_chat = group_manager.models.Chat.objects.filter(participant__group=self.group).order_by('timestamp')
+        previous_message = []
+        messages= []
+        for c in group_chat.all():
+            if c.participant == self:
+                msg = {"role":"assistant", "content": c.text}
+            else:                
+                cont = c.participant.get_nickname() + ":" + c.text
+                msg = {"role":"user", "content": cont}
+            #For stage time we check the timestart of a user, because bots update stages when they poll only
+            participants_in_group = [p for p in group_manager.models.Participant.objects.filter(group=self.group) if not(p.is_bot())]
+            
+            if participants_in_group[0].get_current_stage_timestart() > c.timestamp:
+                previous_message.append(msg)
+            else:
+                messages.append(msg)
+        return previous_message, messages
+
+    def message_bot(self):
+        if self.is_bot:            
+            bot_response = self.bot.send_message(self)
+            return bot_response
+        
     def get_nickname(self):
         if (self.nickname is None) or len(self.nickname) < 2:
             return self.user.username
@@ -177,7 +221,11 @@ class Group(models.Model):
     experiment = models.ForeignKey('Experiment', on_delete=models.SET_NULL, null=True)
 
     is_testing = models.BooleanField(default=False)
-    
+    def get_all_bot_participants(self):
+        return [p
+                for p in Participant.objects.filter(group=self)
+                if p.is_bot()
+                ]
     def get_active_participants(self):
         return [p
                 for p in Participant.objects.filter(group=self)
@@ -233,6 +281,7 @@ class Experiment(models.Model):
 class Question(models.Model):
     text = models.CharField(max_length=256)
     experiment = models.ForeignKey(Experiment, on_delete=models.SET_NULL, null=True)
+    history = HistoricalRecords()
 
 class Chat(models.Model):
     text = models.CharField(max_length=2048)

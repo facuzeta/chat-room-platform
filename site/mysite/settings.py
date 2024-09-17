@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'cms',
     'external_raters',
+    'bot'
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -116,6 +118,13 @@ else:
         }
     }
 
+# REST_FRAMEWORK = {
+#     # Use Django's standard `django.contrib.auth` permissions,
+#     # or allow read-only access for unauthenticated users.
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+#     ]
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -163,18 +172,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Channels
 ASGI_APPLICATION = 'mysite.asgi.application'
 CHANNEL_LAYERS = {
-    #Para deploy hay que revisar esto
-    # 'default': {
-    #     'BACKEND': 'channels_redis.core.RedisChannelLayer',
-    #     'CONFIG': {
-    #        "hosts": [('127.0.0.1', 6379)],
-    #     },
-    # },
+    
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+           "hosts": [('127.0.0.1', 6379)],
+        },
+    },
 
     #Para local run
-    'default': {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+    #'default': {
+    #    "BACKEND": "channels.layers.InMemoryChannelLayer"
+    #}
 }
 
 DOMAIN = 'https://neuroexp.com.ar'

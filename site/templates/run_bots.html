@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<p id="status">Group "{{ g_id }}": Bots running!</p>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const groupId = "{{ g_id }}";
+        const statusElement = document.getElementById('status');
+        fetch('start_bots_v/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ group_id: groupId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+            console.error('Error:', data.error);
+            statusElement.textContent = 'Group  "{{ g_id }}" : Error: ' + data.error;
+        } else {
+            console.log('Bots started:', data);
+            statusElement.textContent = 'Group  "{{ g_id }}" : Bots ran successfully!';
+        }
+            
+        })
+        .catch(error => {
+            console.error('Error starting bots:', error);
+            statusElement.textContent = 'Group  "{{ g_id }}" Error:  ' + data.error;
+        });
+    });
+</script>
+{% endblock %}

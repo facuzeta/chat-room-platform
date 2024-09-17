@@ -2,10 +2,12 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from simple_history.models import HistoricalRecords
 
 
 class Content(models.Model):
     key = models.CharField(max_length=1024)
+    history = HistoricalRecords()
 
     def text(self):
         return self.text_set.all()[0].text
@@ -18,6 +20,7 @@ class Text(models.Model):
     key = models.ForeignKey(Content, on_delete=models.CASCADE)
     lang = models.CharField(max_length=8)
     text = models.TextField(max_length=2048)
+    history = HistoricalRecords()
 
     def __str__(self):
         return f'{[self.lang]}: {self.text}'
@@ -26,6 +29,7 @@ class Text(models.Model):
 class Config(models.Model):
     key = models.CharField(max_length=1024, primary_key=True)
     value = models.CharField(max_length=1024)
+    history = HistoricalRecords()
 
     @classmethod
     def get(cls, key):

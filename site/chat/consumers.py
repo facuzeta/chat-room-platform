@@ -4,7 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 # from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http  
 import group_manager.models
 from channels.db import database_sync_to_async
-
+import bot.models
 
 async def connect(self):
     self.username = await self.get_name()
@@ -29,6 +29,18 @@ def get_nickname_and_color(user):
     nickname = participant.get_nickname()
     color = participant.get_color()
     return nickname, color
+
+@database_sync_to_async
+def get_all_bots_in_same_group(user):    
+    participant = group_manager.models.Participant.objects.get(user=user)    
+    participant_bots_in_group = [p for p in participant.group.participants.all() if p.is_bot()]
+    print(participant_bots_in_group)
+    return participant_bots_in_group
+
+@database_sync_to_async
+def get_bot(behaviour_nickname):
+    current_bot = bot.models.Bot.objects.get(behaviour_nickname=behaviour_nickname)
+    return current_bot
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -60,8 +72,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print('recieve', stage_name, message)
 
         await store_chat(self.user, stage_name, message)
-        nickname, color = await get_nickname_and_color(self.user)
-
+        nickname, color = await get_nickname_and_color(self.user)  
+                  
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -70,10 +82,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'user': nickname,
                 'color': color,
-                'user_id':self.user.id
+                'user_id':self.user.id,
+                'is_bot':False
                 # 'user': self.user.username+'('+str(self.user.id)+')'
             }
-        )
+        ) 
+        
+        
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -81,7 +96,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = event['user']
         color = event['color']
         user_id = event['user_id']
-        own_msg = user_id == self.user.id
+        bot_msg = event['is_bot']
+        own_msg = (user_id == self.user.id and not(bot_msg))        
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
@@ -89,7 +105,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'color': color,
             'own_msg': own_msg
         }))
-
 
 class ChatConsumerForTest(AsyncWebsocketConsumer):
     async def connect(self):
@@ -119,7 +134,7 @@ class ChatConsumerForTest(AsyncWebsocketConsumer):
         stage_name = text_data_json['stage_name']
         # timestamp = text_data_json['timestamp']
         print('recieve', stage_name, message)
-
+        
 
         # Send message to room group
         await self.channel_layer.group_send(

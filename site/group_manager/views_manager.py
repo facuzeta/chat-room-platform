@@ -10,7 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
-import random
 from django.utils.crypto import get_random_string
 from cms.models import Content, Config
 from collections import defaultdict
@@ -18,8 +17,8 @@ from group_manager.views import get_cms
 from django.contrib.admin.views.decorators import staff_member_required
 import dateutil.parser
 from django.contrib.auth import get_user_model
-
-
+from bot.models import *
+import asyncio
 @staff_member_required
 def manager(request):
     context = {}
@@ -27,6 +26,8 @@ def manager(request):
     context['MAX_GROUP_SIZE'] = Config.get('MAX_GROUP_SIZE')
     context['cms'] = get_cms()
     context['experiment'] = Experiment.objects.all()
+    context['bot'] = Bot.objects.all()
+    context['bot_n'] = range(1,5)
     update_screener_google_form()
 
     return render(request, 'manager.html', context)
@@ -201,13 +202,39 @@ def create_group_view(request):
     if not request.user.is_staff:
         raise PermissionDenied
 
-    participants_ids_list = request.POST.getlist('participants_ids_list[]', [])
+    participants_ids_list = request.POST.getlist('participants_ids_list[]', [])    
     experiment_id = request.POST.get('experiment_id', 1)
-
+    bots_n = request.POST.getlist('bot_list[]', [])
+    print(bots_n)
+    #In this way we create a bot participant each time a new group
+    # We could add more options in the manager.html to configure there which bots are created/added to a group
+    bots_participants = create_bots_participants(bots_n)  
     print('create_group_view', participants_ids_list)
-    create_group([Participant.objects.get(id=int(e)) for e in participants_ids_list], experiment_id)
+    g_id = create_group([Participant.objects.get(id=int(e)) for e in participants_ids_list] + bots_participants, experiment_id)
+    return JsonResponse({"group_id":g_id})
 
-    return JsonResponse({})
+
+@staff_member_required
+def start_bots_v(request):
+    try:
+        data = json.loads(request.body)
+        group_id = data.get('group_id')
+        running = len(Group.objects.get(id=int(group_id)).get_active_participants()) > 0
+        if running:
+            bots_participants = Group.objects.get(id=int(group_id)).get_all_bot_participants()
+            asyncio.run(start_bots(bots_participants))
+            return JsonResponse({'status': 'started'})
+        else:
+            return JsonResponse({'error': 'No active participants found'},status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+
+@csrf_exempt
+@staff_member_required
+def run_bots(request):
+    group_id = request.GET.get('group_id')    
+    return render(request, 'run_bots.html', {'g_id': group_id})
 
 def create_expert_answers_with_valuation(user, group):
     res = []

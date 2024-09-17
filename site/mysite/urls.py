@@ -11,7 +11,7 @@ from group_manager.views import get_state, home, \
 from group_manager.views_manager import manager, manager_update, \
     create_group_view, group_status, invite_participants, send_invitation, \
     save_participants_data, create_participant, groups_list, no_ssl, \
-    export_all, save_expert_valuation, create_participant_mail_list
+    export_all, save_expert_valuation, create_participant_mail_list,run_bots,start_bots_v
 
 urlpatterns = [
     path('chat/', include('chat.urls')),
@@ -42,8 +42,10 @@ urlpatterns = [
     path('manager/create_participant_mail_list', create_participant_mail_list),
     path('manager/export_all', export_all),
     path('manager/expert_valuation', save_expert_valuation, name='save_expert_valuation'),
+    path('manager/run_bots', run_bots, name='run_bots'),
+    path('manager/start_bots_v/', start_bots_v, name='start_bots_v'),
 
-    path('external_raters/', include('external_raters.urls'))
+    path('external_raters/', include('external_raters.urls')),
 
 ]
 

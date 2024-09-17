@@ -39,7 +39,7 @@ def login_participant(request):
             return HttpResponseForbidden(request)
 
         User = get_user_model()
-        random_hash = get_random_string()
+        random_hash = get_random_string(length=32)
         user = User.objects.create(username=random_hash)
         Participant.objects.create(user=user, hash=random_hash)
 
