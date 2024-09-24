@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'cms',
     'external_raters',
-    'bot'
+    'bot',
+    'simple_history',
 ]
 
 MIDDLEWARE = [

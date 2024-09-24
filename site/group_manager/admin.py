@@ -4,7 +4,7 @@ from group_manager.models import *
 from django.apps import apps
 from django.utils import timezone
 import json
-
+from simple_history.admin import SimpleHistoryAdmin
 
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
@@ -55,7 +55,7 @@ class AnswerAdmin(admin.ModelAdmin):
 
 
 @admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
+class QuestionAdmin(SimpleHistoryAdmin):
     list_display = ("id", "text", "experiment")
 
 
@@ -73,7 +73,7 @@ class GroupAdmin(admin.ModelAdmin):
 
 
 @admin.register(ChatExpertEvaluationQuestion)
-class ChatExpertEvaluationQuestionAdmin(admin.ModelAdmin):
+class ChatExpertEvaluationQuestionAdmin(SimpleHistoryAdmin):
     list_display = ("text",)
 
 
@@ -82,8 +82,15 @@ class ChatExpertEvaluatioAnswerAdmin(admin.ModelAdmin):
     list_display = ("group", "stage", "question", "user", "value")
 
 
+@admin.register(Experiment)
+class ExperimentAdmin(SimpleHistoryAdmin):
+    list_display = ("name","input_type", "instructions_s2")
+
+
 for model in apps.get_app_config("group_manager").models.values():
     try:
         admin.site.register(model)
     except:
         pass
+
+

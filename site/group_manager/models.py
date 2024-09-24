@@ -51,7 +51,7 @@ class Participant(models.Model):
 
     def get_chat_history(self):
         group_chat = group_manager.models.Chat.objects.filter(participant__group=self.group).order_by('timestamp')
-        previous_message = []
+        previous_messages = []
         messages= []
         for c in group_chat.all():
             if c.participant == self:
@@ -63,10 +63,10 @@ class Participant(models.Model):
             participants_in_group = [p for p in group_manager.models.Participant.objects.filter(group=self.group) if not(p.is_bot())]
             
             if participants_in_group[0].get_current_stage_timestart() > c.timestamp:
-                previous_message.append(msg)
+                previous_messages.append(msg)
             else:
                 messages.append(msg)
-        return previous_message, messages
+        return previous_messages, messages
 
     def message_bot(self):
         if self.is_bot:            
@@ -266,9 +266,10 @@ class Experiment(models.Model):
     input_type = models.CharField(
         max_length=128,
         choices=InputType.choices,
-        default=InputType.VALUE_AND_CONFIDENCE,
+        default=InputType.VALUE_AND_CONFIDENCE,        
     )
     instructions_s2 = models.TextField(default="", null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -297,6 +298,7 @@ class Chat(models.Model):
 
 class ChatExpertEvaluationQuestion(models.Model):
     text = models.CharField(max_length=2048)
+    history = HistoricalRecords()
     def __str__(self): return str(self.id)+' '+self.text
 
 
