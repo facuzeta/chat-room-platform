@@ -202,7 +202,7 @@ async def bot_polling(bot):
                                 )
                             except:                                
                                 ("Bot sending message but exception ocurred")
-                            await asyncio.sleep(3)
+                            await asyncio.sleep(5)
 
             else:
                 print("bot poll, coin failed")
