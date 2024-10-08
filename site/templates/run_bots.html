@@ -26,7 +26,7 @@
         })
         .catch(error => {
             console.error('Error starting bots:', error);
-            statusElement.textContent = 'Group  "{{ g_id }}" Error:  ' + data.error;
+            statusElement.textContent = 'Group  "{{ g_id }}" Error:  ' + error;
         });
     });
 </script>
