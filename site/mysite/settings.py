@@ -24,9 +24,8 @@ DEBUG = env('DEBUG')
 
 ENV_BEANSTALK = 'RDS_PORT' in os.environ
 if ENV_BEANSTALK:
-    #SECURE_SSL_REDIRECT = True
-    #SECURE_REDIRECT_EXEMPT = [r'^no-ssl/$',r'^no-ssl$',]    
-    pass
+    SECURE_SSL_REDIRECT = True
+    SECURE_REDIRECT_EXEMPT = [r'^no-ssl/$',r'^no-ssl$',]
 else:
     DEBUG=True
 
