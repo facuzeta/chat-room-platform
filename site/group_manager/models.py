@@ -21,7 +21,7 @@ class Participant(models.Model):
     #If a participant is a bot, it is linked to the bot model
     bot = models.ForeignKey('bot.Bot', null=True, blank=True, on_delete=models.CASCADE)
 
-    hash = models.CharField(max_length=12, default=get_random_string(length=32))
+    hash = models.CharField(max_length=12, default=get_random_string(length=12))
     group = models.ForeignKey(
         'Group', null=True, blank=True, on_delete=models.SET_NULL, related_name='participants')
 

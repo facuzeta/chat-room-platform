@@ -93,7 +93,7 @@ def create_group(list_of_participants, experiment_id=1):
             print(f'create_group: participant {participant.id} no estaba en first_stage')
         assert(participant.get_current_stage() == Stage.get_first_stage())
 
-    group = Group.objects.create(name=get_random_string(length=32), experiment=experiment)
+    group = Group.objects.create(name=get_random_string(lenght = 12), experiment=experiment)
 
     for participant in list_of_participants:
         transition_ws1_s1(participant)
@@ -322,17 +322,17 @@ def sort_participant_by_screener_test():
 
         for i in range(a):
             r = {'screener_value': 9+random.randint(-1,1), }
-            r['name'] = get_random_string()
+            r['name'] = get_random_string(lenght = 12)
             l_test.append(r)
 
         for i in range(b):
             r = {'screener_value': 5+random.randint(-1,1), }
-            r['name'] = get_random_string()
+            r['name'] = get_random_string(lenght = 12)
             l_test.append(r)
 
         for i in range(c):
             r = {'screener_value': 1+random.randint(-1,1), }
-            r['name'] = get_random_string()
+            r['name'] = get_random_string(lenght = 12)
             l_test.append(r)
         return l_test
 

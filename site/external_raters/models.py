@@ -11,7 +11,7 @@ from group_manager.models import Stage, Group, Chat
 
 
 class ExternalRater(models.Model):
-    hash = models.CharField(max_length=12, default=get_random_string, unique=True)
+    hash = models.CharField(max_length=12, default=get_random_string(lenght = 12), unique=True)
 
 
 class ExternalRateValue(models.Model):
