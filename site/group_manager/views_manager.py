@@ -335,7 +335,7 @@ def create_participant(request):
     print(data)
     for first_name, last_name, email, experiment_timestamp in data:
         experiment_timestamp = dateutil.parser.parse(experiment_timestamp)
-        random_hash = get_random_string(lenght = 12)
+        random_hash = get_random_string(length = 12)
         User = get_user_model()
         user = User.objects.create(first_name=first_name, last_name=last_name, email=email, username=random_hash)
         participant = Participant.objects.create(user=user, hash=random_hash)
@@ -353,9 +353,9 @@ def create_participant_mail_list(request):
     created_participants = []
     for email in emails:
         experiment_timestamp = experiment_timestamp
-        random_hash = get_random_string(lenght = 12)
+        random_hash = get_random_string(length = 12)
         User = get_user_model()
-        user = User.objects.create(first_name=get_random_string(lenght = 12), last_name=get_random_string(lenght = 12), email=email, username=random_hash)
+        user = User.objects.create(first_name=get_random_string(length = 12), last_name=get_random_string(length = 12), email=email, username=random_hash)
         participant = Participant.objects.create(user=user, hash=random_hash)
         participant.experiment_timestamp = experiment_timestamp
         participant.save()
