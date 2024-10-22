@@ -194,13 +194,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'default from email'
 
 
-EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'AKIAWQPWZOY45K3WUUDR'
+EMAIL_HOST = env('EMAIL_HOST') 
+EMAIL_PORT = env('EMAIL_PORT') 
+EMAIL_HOST_USER = env('EMAIL_HOST_USER') 
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = True
-EMAIL_ADDRESS = '"Neuro exp" <no-reply@neuroexp.com.ar>'
-EMAIL = 'no-reply@neuroexp.com.ar'
+EMAIL_USE_TLS = env('EMAIL_USE_TLS') 
+EMAIL_ADDRESS = env('EMAIL_ADDRESS')
+EMAIL = env('EMAIL')
 
 
 if ENV_BEANSTALK:
