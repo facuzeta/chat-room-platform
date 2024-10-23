@@ -1,3 +1,6 @@
 **/.DS_Store
 mysite/.env
 **/migrations
+venv/
+logs/
+*.log

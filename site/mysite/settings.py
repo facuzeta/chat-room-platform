@@ -208,6 +208,10 @@ EMAIL_USE_TLS = env('EMAIL_USE_TLS')
 EMAIL_ADDRESS = env('EMAIL_ADDRESS')
 EMAIL = env('EMAIL')
 
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -224,7 +228,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+            'filename': os.path.join(LOG_DIR, 'django.log'),
             'formatter': 'verbose',
         },
     },
