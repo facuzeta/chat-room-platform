@@ -15,7 +15,9 @@ from django.utils.crypto import get_random_string
 from cms.models import Content, Config
 from collections import defaultdict
 from django.conf import settings
+import logging
 
+logger = logging.getLogger(__name__)
 
 def get_cms():
     r = defaultdict(lambda k: k)
@@ -28,7 +30,7 @@ def login_participant(request):
         raise BadRequest
     user_hash = request.GET.get("hash", None)
     query = Participant.objects.filter(hash=user_hash)
-    print(user_hash, query)
+    logger.info(user_hash, query)
     if query.exists() and user_hash is not None:
         assert query.count() == 1
         user = query[0].user
@@ -95,9 +97,7 @@ def answer(request):
 
     if "s2" in stage_frontend:
         data = json.loads(request.POST.get("answer_dic_s2", "{}"))
-
-    print(participant.id, participant.get_current_stage(), data)
-
+    logger.info(participant.id, participant.get_current_stage(), data)
     stage = Stage.objects.get(name=stage_frontend)
     if not Answer.objects.filter(
         participant=participant,
@@ -134,7 +134,7 @@ def home(request):
 
     current_stage = participant.get_current_stage()
     if current_stage is not None and not current_stage.name == "ws1":
-        print("estoy dentro")
+        logger.info("estoy dentro")
         # ya empezo, osea que ya tiene definido variables
         # y entro por que hizo refresh
         context["question_order"] = participant.group.question_order
@@ -142,7 +142,7 @@ def home(request):
         context["group_name"] = participant.group.name
         context['experiment_input_type'] = participant.group.experiment.input_type
 
-        print("->", participant.group.question_order)
+        logger.info("->", participant.group.question_order)
     return render(request, "index_participant.html", context)
 
 

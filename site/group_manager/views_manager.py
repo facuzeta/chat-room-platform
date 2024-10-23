@@ -19,6 +19,9 @@ import dateutil.parser
 from django.contrib.auth import get_user_model
 from bot.models import *
 from bot.tasks import *
+import logging
+
+logger = logging.getLogger(__name__)
 
 @staff_member_required
 def manager(request):
@@ -187,12 +190,12 @@ def manager_update(request):
         assert(sorted([e['name'] for e in participant_list]) == sorted([e['name'] for e in new_order]))
         assert(sorted([e['screener_value'] for e in participant_list]) == sorted([e['screener_value'] for e in new_order]))
     except:
-        print('Entro en except')
+        logger.error('Entro en except')
         res['participants_list'] = participant_list
 
     cancel_sort_en_true = request.GET.get('cancel_sort', "false") == 'true'
     if  cancel_sort_en_true:
-        print('Parametro get cancel_sort en True' , request.GET.get('cancel_sort', "false"))
+        logger.info('Parametro get cancel_sort en True' , request.GET.get('cancel_sort', "false"))        
         res['participants_list'] = participant_list
 
     return JsonResponse(res)
@@ -206,11 +209,11 @@ def create_group_view(request):
     participants_ids_list = request.POST.getlist('participants_ids_list[]', [])    
     experiment_id = request.POST.get('experiment_id', 1)
     bots_n = request.POST.getlist('bot_list[]', [])
-    print(bots_n)
+    logger.info(bots_n)
     #In this way we create a bot participant each time a new group
     # We could add more options in the manager.html to configure there which bots are created/added to a group
     bots_participants = create_bots_participants(bots_n)  
-    print('create_group_view', participants_ids_list)
+    logger.info('create_group_view', participants_ids_list)
     g_id = create_group([Participant.objects.get(id=int(e)) for e in participants_ids_list] + bots_participants, experiment_id)
     return JsonResponse({"group_id":g_id})
 
@@ -223,7 +226,7 @@ def start_bots_v(request):
         running = len(Group.objects.get(id=int(group_id)).get_active_participants()) > 0
         if running:
             bots_participants = Group.objects.get(id=int(group_id)).get_all_bot_participants()
-            print("Starting the bots")
+            logger.info("Starting the bots")
             for b in bots_participants:
                 celery_run_bot.delay({'pk': b.id})
             return JsonResponse({'status': 'started'})
@@ -280,7 +283,7 @@ def invite_participants(request):
 @staff_member_required
 def send_invitation(request, participant_id):
     is_moral = request.GET.get('is_moral') == 'true'
-    print('is_moral=',is_moral)
+    logger.info('is_moral=',is_moral)    
     
     participant = Participant.objects.get(id=participant_id)
     send_invitation_email(participant, participant.experiment_timestamp)
@@ -313,8 +316,7 @@ def save_participants_data(request):
     last_name = request.POST.get('last_name','')
     email = request.POST.get('email','')
     experiment_timestamp = dateutil.parser.parse(request.POST.get('experiment_timestamp',''))
-
-    print(participant_id, first_name, last_name, email, experiment_timestamp)
+    logger.info(participant_id, first_name, last_name, email, experiment_timestamp)    
     participant = Participant.objects.get(id=participant_id)
     participant.user.first_name = first_name
     participant.user.last_name = last_name
@@ -335,7 +337,7 @@ def create_participant(request):
     experiment_timestamp_list = request.POST.getlist('experiment_timestamp')
 
     data = list(zip(first_name_list, last_name_list, email_list, experiment_timestamp_list))
-    print(data)
+    logger.info(data)
     for first_name, last_name, email, experiment_timestamp in data:
         experiment_timestamp = dateutil.parser.parse(experiment_timestamp)
         random_hash = get_random_string(length = 12)
@@ -435,7 +437,7 @@ def export_all(request):
 def save_expert_valuation(request):
     answers = json.loads(request.POST.get('answers'))
     for r in answers:
-        print(r)
+        logger.info(r)
         question_id = r['question_id']
         stage_name = r['stage_name']
         group_id = r['group_id']

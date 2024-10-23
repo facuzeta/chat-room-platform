@@ -5,6 +5,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import group_manager.models
 from channels.db import database_sync_to_async
 import bot.models
+import logging
+
+logger = logging.getLogger(__name__)
 
 async def connect(self):
     self.username = await self.get_name()
@@ -15,10 +18,8 @@ def get_name(self):
 
 @database_sync_to_async
 def store_chat(user, stage_name, message):
-    print('store_chat',user, stage_name, message)
+    logger.info('store_chat',user, stage_name, message)
     participant = group_manager.models.Participant.objects.get(user=user)
-    print(group_manager.models.Participant)
-    print(group_manager.models.Stage)
     stage = group_manager.models.Stage.objects.get(name=stage_name)
     group_manager.models.Chat.objects.create(text=message, participant=participant, stage=stage)
 
@@ -34,7 +35,6 @@ def get_nickname_and_color(user):
 def get_all_bots_in_same_group(user):    
     participant = group_manager.models.Participant.objects.get(user=user)    
     participant_bots_in_group = [p for p in participant.group.participants.all() if p.is_bot()]
-    print(participant_bots_in_group)
     return participant_bots_in_group
 
 @database_sync_to_async
@@ -69,8 +69,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         stage_name = text_data_json['stage_name']
         # timestamp = text_data_json['timestamp']
-        print('recieve', stage_name, message)
-
+        logger.info('recieve', stage_name, message)
         await store_chat(self.user, stage_name, message)
         nickname, color = await get_nickname_and_color(self.user)  
                   
@@ -133,7 +132,7 @@ class ChatConsumerForTest(AsyncWebsocketConsumer):
         message = text_data_json['message']
         stage_name = text_data_json['stage_name']
         # timestamp = text_data_json['timestamp']
-        print('recieve', stage_name, message)
+        logger.info('recieve', stage_name, message)
         
 
         # Send message to room group

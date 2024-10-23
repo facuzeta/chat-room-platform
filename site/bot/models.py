@@ -5,6 +5,9 @@ import json
 from simple_history.models import HistoricalRecords
 from group_manager.models import Participant
 import os 
+import logging
+
+logger = logging.getLogger(__name__)
 # Create your models here.
 class Bot(models.Model): 
     behaviour_nickname= models.CharField(max_length=128)   
@@ -86,10 +89,10 @@ class Bot(models.Model):
                     response_json = response.json()
                     return response_json['choices'][0]['message']['content'].strip()
                 else:
-                    print(f"Error: {response.status_code}, {response.text}")
+                    logger.error(f"Error: {response.status_code}, {response.text}")
                     return ""                
             except Exception as e:
-                print(f"Error: {e}")
+                logger.error(f"Error: {e}")
             return ""
 
         #To use an external ollama, it should be named with "external_ollama" on it nickname
@@ -106,10 +109,10 @@ class Bot(models.Model):
                     data_response = json.loads(response.text)                  
                     return data_response["message"]["content"]  
                 else:
-                    print(f"Error: {response.status_code}, {response.text}")
-                    return ""
+                    logger.error(f"Error: {response.status_code}, {response.text}")
+                    return ""                
             except Exception as e:
-                print(f"Error: {e}")
+                logger.error(f"Error: {e}")
             return ""
                     
         
@@ -122,8 +125,8 @@ class Bot(models.Model):
                     data_response = json.loads(response.text)                  
                     return data_response["message"]["content"]  
                 else:
-                    print(f"Error: {response.status_code}, {response.text}")
-                    return ""
+                    logger.error(f"Error: {response.status_code}, {response.text}")
+                    return ""                
         except Exception as e:
-            print(f"Error: {e}")
+            logger.error(f"Error: {e}")
         return ""

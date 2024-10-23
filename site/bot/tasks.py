@@ -4,14 +4,14 @@ import random
 from group_manager.services import *
 import asyncio
 import time
+import django
+import os
 
 def import_django_instance():
     """
     Makes django environment available 
     to tasks!!
     """
-    import django
-    import os
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
     django.setup()
 

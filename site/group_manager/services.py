@@ -15,6 +15,9 @@ from channels.layers import get_channel_layer
 import random
 from channels.db import database_sync_to_async
 from bot.models import Bot
+import logging
+
+logger = logging.getLogger(__name__)
 
 def transition(participant, stage2_name):
     StageParticipant.objects.create(participant=participant,
@@ -88,7 +91,7 @@ def create_group(list_of_participants, experiment_id=1):
     # Check that all participants are in sw1
     for participant in list_of_participants:
         if participant.get_current_stage() != Stage.get_first_stage():
-            print(f'create_group: participant {participant.id} no estaba en first_stage')
+            logger.error(f'create_group: participant {participant.id} no estaba en first_stage')
         assert(participant.get_current_stage() == Stage.get_first_stage())
 
     group = Group.objects.create(name=get_random_string(length = 12), experiment=experiment)
@@ -106,15 +109,11 @@ def create_group(list_of_participants, experiment_id=1):
     return group.id
 
 def store_chat(bot, stage_name, message):
-    print('store_chat',bot, stage_name, message) 
+    logger.info('store_chat',bot, stage_name, message)
 
     #If it has to store a bot message, the user is the bot participant,
-    #   else it is the user and has to get the participant
-    
+    #   else it is the user and has to get the participant    
     participant = bot    
-
-    print(group_manager.models.Participant)
-    print(group_manager.models.Stage)
     stage = group_manager.models.Stage.objects.get(name=stage_name)
     group_manager.models.Chat.objects.create(text=message, participant=participant, stage=stage)
 
@@ -136,7 +135,7 @@ def create_bots_participants(bots_n):
                 "Nico"
         ]   
     for b in bots_n:
-        print("creating new bot of type: " + b )
+        logger.info("creating new bot of type: " + b )
         bot_template = Bot.objects.get(behaviour_nickname= b)  
         #name selection      
         if bot_template.use_random_nickname:
@@ -180,7 +179,6 @@ def send_invitation_email(participant, timestamp_experiment):
                                      'email_invitation.html')
     template = get_template(template_filename)
     html = template.render(context)
-    print(html)
     datetime_subject = str(timestamp_experiment.astimezone()).split('.')[0][:-3]
     send_mail(f'Invitación {datetime_subject}', '', f'Invitación Experimento<{settings.EMAIL}>', [email], html_message=html)
 
@@ -194,7 +192,7 @@ def get_serialized_questions(participant):
         {"question_id": q.id, "text": q.text} for q in Question.objects.filter(experiment=experiment)
         ]
     except: 
-        print('except en get_serialized_questions')
+        logger.error('except en get_serialized_questions')
         return []
 
 
