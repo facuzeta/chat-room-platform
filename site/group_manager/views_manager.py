@@ -229,7 +229,8 @@ def start_bots_v(request):
             bots_participants = group.get_all_bot_participants()
             logger.info("Starting the bots")
             for b in bots_participants:
-                if not b.is_polling:
+                print( )
+                if not b.is_polling():
                     celery_run_bot.delay({'pk': b.id})
                     b.toggle_polling()
             return JsonResponse({'status': 'started'})
