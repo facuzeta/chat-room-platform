@@ -36,10 +36,16 @@ class Participant(models.Model):
     nickname = models.CharField(max_length=128, null=True, blank=True)
     
     screener_value = models.FloatField(default=-1)
+    polling = models.BooleanField(default=False)
 
     def is_bot(self):
+        return not(self.bot is None)
+    
+    def is_polling(self):
+        return self.polling
 
-        return not(self.bot is None)  
+    def toggle_polling(self):
+        self.polling = not self.polling
     
     def get_questions_order(self):
         return  self.group.question_order_s2

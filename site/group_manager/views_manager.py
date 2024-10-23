@@ -223,12 +223,15 @@ def start_bots_v(request):
     try:
         data = json.loads(request.body)
         group_id = data.get('group_id')
-        running = len(Group.objects.get(id=int(group_id)).get_active_participants()) > 0
-        if running:
-            bots_participants = Group.objects.get(id=int(group_id)).get_all_bot_participants()
+        group = Group.objects.get(id=int(group_id))
+        are_participants_active = len(group.get_active_participants()) > 0
+        if are_participants_active:            
+            bots_participants = group.get_all_bot_participants()
             logger.info("Starting the bots")
             for b in bots_participants:
-                celery_run_bot.delay({'pk': b.id})
+                if not b.is_polling:
+                    celery_run_bot.delay({'pk': b.id})
+                    b.toggle_polling()
             return JsonResponse({'status': 'started'})
         else:
             return JsonResponse({'error': 'No active participants found'},status=400)

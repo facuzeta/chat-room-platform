@@ -18,10 +18,9 @@ def get_name(self):
 
 @database_sync_to_async
 def store_chat(user, stage_name, message):
-    logger.info(f'store_chat participant.id: {participant.id}, stage_name: {stage_name}, message: {message}')
-
     participant = group_manager.models.Participant.objects.get(user=user)
     stage = group_manager.models.Stage.objects.get(name=stage_name)
+    logger.info(f'store_chat participant.id: {participant.id}, stage_name: {stage_name}, message: {message}')
     group_manager.models.Chat.objects.create(text=message, participant=participant, stage=stage)
 
 @database_sync_to_async
