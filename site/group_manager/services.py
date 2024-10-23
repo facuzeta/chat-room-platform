@@ -47,14 +47,14 @@ def get_stage_and_change(participant):
     group = participant.group
     if current_stage.name in ['s1']:
         try:            
-            if group.have_active_participants_completed(current_stage) or stage_timeout(participant, current_stage):
+            if group.have_user_participants_completed(current_stage) or stage_timeout(participant, current_stage):
                 transition(participant, current_stage.next())
         except:
             #If he does not have group, back to ws1
             StageParticipant.objects.get(Participant=participant,Stage=current_stage).delete()
 
     if current_stage.name in [ 's2_1', 's2_2', 's2_3', 's2_4', 's3']:
-        if group.have_active_participants_completed(current_stage) or stage_timeout(participant, current_stage):
+        if stage_timeout(participant, current_stage):
             transition(participant, current_stage.next())
 
     return participant.get_current_stage()
@@ -108,12 +108,8 @@ def create_group(list_of_participants, experiment_id=1):
     group.save()
     return group.id
 
-def store_chat(bot, stage_name, message):
-    logger.info('store_chat',bot, stage_name, message)
-
-    #If it has to store a bot message, the user is the bot participant,
-    #   else it is the user and has to get the participant    
-    participant = bot    
+def store_chat(participant, stage_name, message):
+    logger.info(f'store_chat participant.id: {participant.id}, stage_name: {stage_name}, message: {message}')
     stage = group_manager.models.Stage.objects.get(name=stage_name)
     group_manager.models.Chat.objects.create(text=message, participant=participant, stage=stage)
 

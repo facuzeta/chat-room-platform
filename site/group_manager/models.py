@@ -226,6 +226,11 @@ class Group(models.Model):
                 for p in Participant.objects.filter(group=self)
                 if p.is_bot()
                 ]
+    def get_all_user_participants(self):
+        return [p
+                for p in Participant.objects.filter(group=self)
+                if not p.is_bot()
+                ]
     def get_active_participants(self):
         return [p
                 for p in Participant.objects.filter(group=self)
@@ -242,10 +247,10 @@ class Group(models.Model):
     #     if self.are_active_participants_in_same_stage():
     #         return self.get_current_stage_active_participants()[0]
 
-    def have_active_participants_completed(self, stage):
+    def have_user_participants_completed(self, stage):
         res = [
             p.participant_has_completed(stage)
-            for p in self.get_active_participants()
+            for p in self.get_all_user_participants()
         ]
 
         return all(res)

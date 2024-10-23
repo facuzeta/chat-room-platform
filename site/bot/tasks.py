@@ -72,6 +72,9 @@ def celery_run_bot(self, data):
             else:
                 print("Bot coin flip failed")
             self.retry(args=[data], countdown=bot.bot.poll_time)
+    else:
+        #Esto es para dejar al bot en ultimo stage
+        get_stage_and_change(bot)
 
 
     

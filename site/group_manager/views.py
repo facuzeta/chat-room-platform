@@ -30,7 +30,7 @@ def login_participant(request):
         raise BadRequest
     user_hash = request.GET.get("hash", None)
     query = Participant.objects.filter(hash=user_hash)
-    logger.info(user_hash, query)
+    logger.info(f"user_hash: {user_hash}, query: {query}")
     if query.exists() and user_hash is not None:
         assert query.count() == 1
         user = query[0].user
@@ -97,7 +97,7 @@ def answer(request):
 
     if "s2" in stage_frontend:
         data = json.loads(request.POST.get("answer_dic_s2", "{}"))
-    logger.info(participant.id, participant.get_current_stage(), data)
+    logger.info(f"Participant ID: {participant.id}, Current Stage: {participant.get_current_stage().name}, Data: {data}")
     stage = Stage.objects.get(name=stage_frontend)
     if not Answer.objects.filter(
         participant=participant,
@@ -141,8 +141,6 @@ def home(request):
         context["question_order_s2"] = participant.group.question_order_s2
         context["group_name"] = participant.group.name
         context['experiment_input_type'] = participant.group.experiment.input_type
-
-        logger.info("->", participant.group.question_order)
     return render(request, "index_participant.html", context)
 
 

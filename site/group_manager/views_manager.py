@@ -195,7 +195,7 @@ def manager_update(request):
 
     cancel_sort_en_true = request.GET.get('cancel_sort', "false") == 'true'
     if  cancel_sort_en_true:
-        logger.info('Parametro get cancel_sort en True' , request.GET.get('cancel_sort', "false"))        
+        logger.info('Parametro get cancel_sort en True' + str(request.GET.get('cancel_sort', "false")))        
         res['participants_list'] = participant_list
 
     return JsonResponse(res)
@@ -209,11 +209,11 @@ def create_group_view(request):
     participants_ids_list = request.POST.getlist('participants_ids_list[]', [])    
     experiment_id = request.POST.get('experiment_id', 1)
     bots_n = request.POST.getlist('bot_list[]', [])
-    logger.info(bots_n)
+    logger.info(str(bots_n))
     #In this way we create a bot participant each time a new group
     # We could add more options in the manager.html to configure there which bots are created/added to a group
     bots_participants = create_bots_participants(bots_n)  
-    logger.info('create_group_view', participants_ids_list)
+    logger.info(f"create_group_view: participants_ids_list={participants_ids_list}")
     g_id = create_group([Participant.objects.get(id=int(e)) for e in participants_ids_list] + bots_participants, experiment_id)
     return JsonResponse({"group_id":g_id})
 
@@ -283,7 +283,7 @@ def invite_participants(request):
 @staff_member_required
 def send_invitation(request, participant_id):
     is_moral = request.GET.get('is_moral') == 'true'
-    logger.info('is_moral=',is_moral)    
+    logger.info('is_moral=' + str(is_moral))    
     
     participant = Participant.objects.get(id=participant_id)
     send_invitation_email(participant, participant.experiment_timestamp)
@@ -316,7 +316,7 @@ def save_participants_data(request):
     last_name = request.POST.get('last_name','')
     email = request.POST.get('email','')
     experiment_timestamp = dateutil.parser.parse(request.POST.get('experiment_timestamp',''))
-    logger.info(participant_id, first_name, last_name, email, experiment_timestamp)    
+    logger.info(f"Participant Info - ID: {participant_id}, First Name: {first_name}, Last Name: {last_name}, Email: {email}, Timestamp: {experiment_timestamp}")
     participant = Participant.objects.get(id=participant_id)
     participant.user.first_name = first_name
     participant.user.last_name = last_name

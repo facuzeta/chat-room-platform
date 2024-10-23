@@ -18,7 +18,8 @@ def get_name(self):
 
 @database_sync_to_async
 def store_chat(user, stage_name, message):
-    logger.info('store_chat',user, stage_name, message)
+    logger.info(f'store_chat participant.id: {participant.id}, stage_name: {stage_name}, message: {message}')
+
     participant = group_manager.models.Participant.objects.get(user=user)
     stage = group_manager.models.Stage.objects.get(name=stage_name)
     group_manager.models.Chat.objects.create(text=message, participant=participant, stage=stage)
@@ -69,7 +70,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         stage_name = text_data_json['stage_name']
         # timestamp = text_data_json['timestamp']
-        logger.info('recieve', stage_name, message)
+        logger.info(f'receive stage_name: {stage_name}, message: {message}')
+
         await store_chat(self.user, stage_name, message)
         nickname, color = await get_nickname_and_color(self.user)  
                   
@@ -132,7 +134,8 @@ class ChatConsumerForTest(AsyncWebsocketConsumer):
         message = text_data_json['message']
         stage_name = text_data_json['stage_name']
         # timestamp = text_data_json['timestamp']
-        logger.info('recieve', stage_name, message)
+        logger.info(f'receive stage_name: {stage_name}, message: {message}')
+
         
 
         # Send message to room group
