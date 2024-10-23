@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'external_raters',
     'bot',
     'simple_history',
+    'celery',
 ]
 
 MIDDLEWARE = [
@@ -186,6 +187,10 @@ CHANNEL_LAYERS = {
     #    "BACKEND": "channels.layers.InMemoryChannelLayer"
     #}
 }
+
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 DOMAIN = 'https://neuroexp.com.ar'
 

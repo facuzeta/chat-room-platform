@@ -18,7 +18,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 import dateutil.parser
 from django.contrib.auth import get_user_model
 from bot.models import *
-import asyncio
+from bot.tasks import *
+
 @staff_member_required
 def manager(request):
     context = {}
@@ -222,7 +223,9 @@ def start_bots_v(request):
         running = len(Group.objects.get(id=int(group_id)).get_active_participants()) > 0
         if running:
             bots_participants = Group.objects.get(id=int(group_id)).get_all_bot_participants()
-            asyncio.run(start_bots(bots_participants))
+            print("Starting the bots")
+            for b in bots_participants:
+                celery_run_bot.delay({'pk': b.id})
             return JsonResponse({'status': 'started'})
         else:
             return JsonResponse({'error': 'No active participants found'},status=400)

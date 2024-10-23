@@ -41,19 +41,17 @@ def get_stage_and_change(participant):
     #     if group.have_active_participants_completed(current_stage):
     #         print('estoy en get_stage_and_change ws2 TRUE')
     #         transition(participant, current_stage.next())
-
+    group = participant.group
     if current_stage.name in ['s1']:
-        group = participant.group
         try:            
-            if group.have_active_participants_completed(current_stage) or \
-            stage_timeout(participant, current_stage):
+            if group.have_active_participants_completed(current_stage) or stage_timeout(participant, current_stage):
                 transition(participant, current_stage.next())
         except:
             #If he does not have group, back to ws1
             StageParticipant.objects.get(Participant=participant,Stage=current_stage).delete()
 
     if current_stage.name in [ 's2_1', 's2_2', 's2_3', 's2_4', 's3']:
-        if stage_timeout(participant, current_stage):
+        if group.have_active_participants_completed(current_stage) or stage_timeout(participant, current_stage):
             transition(participant, current_stage.next())
 
     return participant.get_current_stage()
@@ -155,59 +153,6 @@ def create_bots_participants(bots_n):
         bot_stage.save()
         bots_participants.append(new_bot)
     return bots_participants
-
-async def start_bots(bots):       
-    tasks = [asyncio.create_task(bot_polling(b)) for b in bots]
-    await asyncio.gather(*tasks)
-
-async def bot_polling(bot):  
-    bot_current_stage = await sync_to_async(get_stage_and_change,thread_sensitive=False)(bot)    
-    room_group = "chat_"+ bot.group.name       
-    channel_layer = get_channel_layer()
-    #El bot se queda en s1 hasta que todos los participantes terminen las encuestas 
-    while bot_current_stage.name == 's1' and bot.group != None:        
-        bot_current_stage = await sync_to_async(get_stage_and_change,thread_sensitive=False)(bot) 
-        print(bot_current_stage.name, bot.bot.behaviour_nickname) 
-        await asyncio.sleep(2)
-    #El bot checkea el chat y responde mientras esten en stage de conversacion
-    while bot_current_stage.name != 's3'and bot.group != None:
-        bot_current_stage = await sync_to_async(get_stage_and_change,thread_sensitive=False)(bot)
-        if bot_current_stage.name in ['s2_1', 's2_2', 's2_3', 's2_4']:     
-                                   
-            if bot.bot.reply_probability > random.uniform(0, 1):
-                print("bot poll, calling response")                   
-                bot_response = await sync_to_async(bot.message_bot,thread_sensitive=False)()                 
-                print("got this response", bot_response)                      
-                #Si el LLM tarda mucho en hacer la respuesta y cambia el stage, no manda el mensaje
-                stage_after_think = await sync_to_async(get_stage_and_change,thread_sensitive=False)(bot)
-                if bot_current_stage == stage_after_think:
-                    #Esto es para dividir el mensaje que manda si ignora el prompt y es muy largo        
-                    phrases = bot_response.split(".")
-                    for p in phrases: 
-                        if p != "":
-                            await database_sync_to_async(store_chat,thread_sensitive=False)(bot, bot_current_stage, p) 
-                            color = await sync_to_async(bot.get_color,thread_sensitive=False)() 
-                            try: 
-                                await channel_layer.group_send(
-                                    room_group,
-                                    {
-                                        'type': 'chat_message',
-                                        'message': p,
-                                        'user': bot.nickname,
-                                        'color':  color,
-                                        'user_id':bot.bot.id,
-                                        'is_bot': True
-                                        # 'user': self.user.username+'('+str(self.user.id)+')'
-                                    }
-                                )
-                            except:                                
-                                ("Bot sending message but exception ocurred")
-                            await asyncio.sleep(5)
-
-            else:
-                print("bot poll, coin failed")
-            await asyncio.sleep(bot.bot.poll_time)
-
 
 def send_invitation_email(participant, timestamp_experiment):
     participant.invitation_send = True
