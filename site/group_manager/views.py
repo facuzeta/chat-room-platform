@@ -37,7 +37,7 @@ def login_participant(request):
         login(request, user)
 
     else:
-        if settings.ENV_BEANSTALK:
+        if not settings.DEBUG:
             return HttpResponseForbidden(request)
 
         User = get_user_model()
