@@ -46,6 +46,7 @@ class Participant(models.Model):
 
     def toggle_polling(self):
         self.polling = not self.polling
+        self.save()
     
     def get_questions_order(self):
         return  self.group.question_order_s2
