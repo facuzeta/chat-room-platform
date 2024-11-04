@@ -69,7 +69,8 @@ def celery_run_bot(self, data):
                                     
                                 except:                                
                                     print("Exception ocurred when sending message to chat")
-                                    time.sleep(5)
+                                    break
+                                time.sleep(2)
                         
 
                 else:
