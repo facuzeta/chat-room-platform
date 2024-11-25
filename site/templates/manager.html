@@ -14,7 +14,7 @@
 <br>
 <h4>Crear grupo</h4>
 {% for e in experiment %}
-    <a class="btn btn-success {% if forloop.first %} btn-info {% endif %}" href='javascript:create_group_exp({{e.id}})'>Crear gurpo en exp <b>{{e.name}}</b></a>
+    <a class="btn btn-success {% if forloop.first %} btn-info {% endif %}" href='javascript:create_group_exp({{e.id}})'>Crear grupo en exp <b>{{e.name}}</b></a>
 {% endfor %}
 <br>
 <br>
