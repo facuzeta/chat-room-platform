@@ -279,7 +279,7 @@ def group_status(request, group_id):
 def invite_participants(request):
     context = {}
     context['cms'] = get_cms()
-    context['participants'] = Participant.objects.all().order_by('-id')
+    context['participants'] = [p for p in Participant.objects.all().order_by('-id') if not p.is_bot()]
     return render(request, 'invite_participants.html', context)
 
 @csrf_exempt
