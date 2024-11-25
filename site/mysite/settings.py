@@ -193,7 +193,7 @@ CELERY_BROKER_URL = 'redis://localhost:6379/1'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
-DOMAIN = 'https://neuroexp.com.ar'
+DOMAIN = os.environ['DOMAIN']
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
