@@ -42,35 +42,35 @@ def celery_run_bot(self, data):
                                     
                 if bot.bot.reply_probability > random.uniform(0, 1):
                     print("Bot coin flip success, calling response")                   
-                    bot_response = bot.message_bot()                 
+                    context, bot_response = bot.message_bot()                 
                     print("Got this response [" + bot_response + "], sending it to chat")                      
                     #Si el LLM tarda mucho en hacer la respuesta y cambia el stage, no manda el mensaje
                     stage_after_think = get_stage_and_change(bot)
                     if bot_current_stage == stage_after_think:
                         #Esto es para dividir el mensaje que manda si ignora el prompt y es muy largo        
-                        phrases = bot_response.split(".")
-                        for p in phrases: 
-                            if p != "":
-                                store_chat(bot, bot_current_stage, p) 
-                                color = bot.get_color() 
-                                try: 
-                                    asyncio.run(channel_layer.group_send(
-                                        room_group,
-                                        {
-                                            'type': 'chat_message',
-                                            'message': p,
-                                            'user': bot.nickname,
-                                            'color':  color,
-                                            'user_id':bot.bot.id,
-                                            'is_bot': True
-                                            # 'user': self.user.username+'('+str(self.user.id)+')'
-                                        }
-                                    ))
-                                    
-                                except:                                
-                                    print("Exception ocurred when sending message to chat")
-                                    break
-                                time.sleep(2)
+                        #phrases = bot_response.split(".")
+                        #for p in phrases: 
+                        if bot_response != "":
+                            store_bot_chat(bot, bot_current_stage, bot_response, context) 
+                            color = bot.get_color() 
+                            try: 
+                                asyncio.run(channel_layer.group_send(
+                                    room_group,
+                                    {
+                                        'type': 'chat_message',
+                                        'message': bot_response,
+                                        'user': bot.nickname,
+                                        'color':  color,
+                                        'user_id':bot.bot.id,
+                                        'is_bot': True
+                                        # 'user': self.user.username+'('+str(self.user.id)+')'
+                                    }
+                                ))
+                                
+                            except:                                
+                                print("Exception ocurred when sending message to chat")
+                                
+                            time.sleep(2)
                         
 
                 else:

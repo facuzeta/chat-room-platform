@@ -109,10 +109,10 @@ def create_group(list_of_participants, experiment_id=1):
     group.save()
     return group.id
 
-def store_chat(participant, stage_name, message):
-    logger.info(f'store_chat participant.id: {participant.id}, stage_name: {stage_name}, message: {message}')
+def store_bot_chat(participant, stage_name, message, context):
+    logger.info(f'store_bot_chat participant.id: {participant.id}, stage_name: {stage_name}, message: {message}')
     stage = group_manager.models.Stage.objects.get(name=stage_name)
-    group_manager.models.Chat.objects.create(text=message, participant=participant, stage=stage)
+    return group_manager.models.Chat.objects.create(text=message, participant=participant, stage=stage, context = context)
 
 def create_bots_participants(bots_n):
     bots_participants = []
@@ -135,7 +135,7 @@ def create_bots_participants(bots_n):
         logger.info("creating new bot of type: " + b )
         bot_template = Bot.objects.get(behaviour_nickname= b)  
         #name selection      
-        if bot_template.use_random_nickname:
+        if bot_template.make_random_nickname_on_create:
             name = random.choice(nombres)       
             nombres.remove(name)
         elif not bot_template.chatroom_nickname:

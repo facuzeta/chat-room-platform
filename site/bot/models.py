@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 class Bot(models.Model): 
     behaviour_nickname= models.CharField(max_length=128)   
     chatroom_nickname = models.CharField(max_length=128,blank=True, null=True)
-    use_random_nickname = models.BooleanField(default=True) 
+    make_random_nickname_on_create = models.BooleanField(default=True) 
     system_prompt = models.TextField() 
     reply_probability = models.FloatField(default=0.5, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])    
     model = models.CharField(max_length=128)
     poll_time = models.IntegerField(default=5)   
-    use_own_nickname = models.BooleanField(default=True)
+    know_own_nickname = models.BooleanField(default=True)
     use_current_topic = models.BooleanField(default=True)
     use_all_chat_history = models.BooleanField(default=False)
     use_time_left_threshold = models.BooleanField(default=False)
@@ -43,11 +43,11 @@ class Bot(models.Model):
         if(self.model == "mockup_repeat"):
             if len(chat_history)>0:
                 last_msg = chat_history[-1]["content"]
-                return last_msg
-            return "hello"
+                return [last_msg], last_msg
+            return [last_msg], "hello"
              
         if (self.model == "mockup_hello"):
-            return "hello"
+            return [last_msg], "hello"
         
         messages=[]
 
@@ -66,14 +66,14 @@ class Bot(models.Model):
         if(self.use_current_topic):           
             information_lines.append("INFORMATION-CURRENT_TOPIC: " + current_question) 
 
-        if(self.use_own_nickname):   
+        if(self.know_own_nickname):   
             information_lines.append("INFORMATION-NAME: " + bot_nick)         
 
         system_message = "\n".join(information_lines + [self.system_prompt])
         messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history           
         
 
-        #Send messages to gpt model
+        #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
             api_key = os.environ["OPEN_AI_API_KEY"]
             url = "https://api.openai.com/v1/chat/completions"
@@ -87,13 +87,13 @@ class Bot(models.Model):
                 response = requests.post(url, headers=headers, data=json.dumps(payload))
                 if response.status_code == 200:
                     response_json = response.json()
-                    return response_json['choices'][0]['message']['content'].strip()
+                    return messages, response_json['choices'][0]['message']['content'].strip()
                 else:
                     logger.error(f"Error: {response.status_code}, {response.text}")
-                    return ""                
+                    return messages,""                
             except Exception as e:
                 logger.error(f"Error: {e}")
-            return ""
+            return messages,""
 
         #To use an external ollama, it should be named with "external_ollama" on it nickname
         if "external_ollama" in self.behaviour_nickname:  
@@ -107,13 +107,13 @@ class Bot(models.Model):
                 response = requests.post(url, headers=headers, json=data)   
                 if response.status_code == 200:  
                     data_response = json.loads(response.text)                  
-                    return data_response["message"]["content"]  
+                    return messages,data_response["message"]["content"]  
                 else:
                     logger.error(f"Error: {response.status_code}, {response.text}")
-                    return ""                
+                    return messages,""                
             except Exception as e:
                 logger.error(f"Error: {e}")
-            return ""
+            return messages,""
                     
         
         #By default it will send to local ollama server
@@ -123,10 +123,10 @@ class Bot(models.Model):
                 response = requests.post(url, json=data)   
                 if response.status_code == 200:  
                     data_response = json.loads(response.text)                  
-                    return data_response["message"]["content"]  
+                    return messages, data_response["message"]["content"]  
                 else:
                     logger.error(f"Error: {response.status_code}, {response.text}")
-                    return ""                
+                    return messages,""                
         except Exception as e:
             logger.error(f"Error: {e}")
-        return ""
+        return messages,""

@@ -303,6 +303,7 @@ class Chat(models.Model):
     stage = models.ForeignKey(
         Stage, null=True, blank=True, on_delete=models.SET_NULL)
     timestamp = models.DateTimeField(auto_now_add=True)
+    context = models.TextField(null=True, blank=True)
     class Meta:
         indexes = [
             models.Index(fields=['participant', 'stage']),            
