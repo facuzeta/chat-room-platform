@@ -150,9 +150,8 @@ def create_bots_participants(bots_n):
         bots_participants.append(new_bot)
     return bots_participants
 
-def format_timestamp(timestamp, offset_hours):
-    
-    date_obj = timestamp + timedelta(hours=offset_hours)  
+def format_timestamp(timestamp):    
+    date_obj = timestamp 
     formatted_timestamp = date_obj.strftime('%Y%m%dT%H%M%SZ')
     date_obj_end = date_obj + timedelta(minutes=20)  
     formatted_timestamp_end= date_obj_end.strftime('%Y%m%dT%H%M%SZ')
@@ -165,11 +164,9 @@ def send_invitation_email(participant, timestamp_experiment):
     email = participant.user.email
     link = settings.DOMAIN+f'/login?hash={participant.hash}'
     timestamp_experiment = timestamp_experiment
+    
 
-    #This depends on the Time zone
-    offset_hours = 3
-
-    calendar_start_datetime, calendar_end_datetime = format_timestamp(timestamp_experiment, offset_hours)    
+    calendar_start_datetime, calendar_end_datetime = format_timestamp(timestamp_experiment)    
     calendar_details = ''
     calendar_title = ''
     link_mas_info_experiment = 'https://'
