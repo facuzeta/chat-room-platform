@@ -184,7 +184,7 @@ def send_invitation_email(participant, timestamp_experiment):
     template = get_template(template_filename)
     html = template.render(context)
     datetime_subject = str(timestamp_experiment.astimezone()).split('.')[0][:-3]
-    send_mail(f'Invitación: Experimento {participant.user.first_name}{participant.user.last_name} @ {datetime_subject}', '', f'Invitación Experimento<{settings.EMAIL}>', [email], html_message=html)
+    send_mail(f'Invitación: Experimento {participant.user.first_name} {participant.user.last_name} @ {datetime_subject}', '', f'Invitación Experimento<{settings.EMAIL}>', [email], html_message=html)
 
 
 
