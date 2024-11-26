@@ -152,8 +152,7 @@ def create_bots_participants(bots_n):
 
 def format_timestamp(timestamp, offset_hours):
     
-    date_obj = datetime.strptime(timestamp, '%d %b. %Y %H:%M')  
-    date_obj = date_obj + timedelta(hours=offset_hours)  
+    date_obj = timestamp + timedelta(hours=offset_hours)  
     formatted_timestamp = date_obj.strftime('%Y%m%dT%H%M%SZ')
     date_obj_end = date_obj + timedelta(minutes=20)  
     formatted_timestamp_end= date_obj_end.strftime('%Y%m%dT%H%M%SZ')
