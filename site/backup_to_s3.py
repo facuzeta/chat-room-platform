@@ -12,7 +12,7 @@ filename = f'{timestamp}__backup.json'
 zip_filename = f'/tmp/{filename}.zip'
 
 # Dump data to a JSON file excluding unnecessary data
-dump_command = f'python3 manage.py dumpdata --exclude=sessions.session --exclude=admin.logentry --exclude=auth.permission --exclude=contenttypes --exclude=background_task --exclude=auth.group --indent=2 > /tmp/{filename}'
+dump_command = f'python3 manage.py dumpdata --exclude=sessions.session --exclude=admin.logentry --exclude=auth.permission --exclude=contenttypes --exclude=auth.group --indent=2 > /tmp/{filename}'
 os.system(dump_command)
 
 # Zip the JSON file
