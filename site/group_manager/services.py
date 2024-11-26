@@ -16,6 +16,7 @@ import random
 from channels.db import database_sync_to_async
 from bot.models import Bot
 import logging
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -149,6 +150,15 @@ def create_bots_participants(bots_n):
         bots_participants.append(new_bot)
     return bots_participants
 
+def format_timestamp(timestamp, offset_hours):
+    
+    date_obj = datetime.strptime(timestamp, '%d %b. %Y %H:%M')  
+    date_obj = date_obj + timedelta(hours=offset_hours)  
+    formatted_timestamp = date_obj.strftime('%Y%m%dT%H%M%SZ')
+    date_obj_end = date_obj + timedelta(minutes=20)  
+    formatted_timestamp_end= date_obj_end.strftime('%Y%m%dT%H%M%SZ')
+    return formatted_timestamp, formatted_timestamp_end
+
 def send_invitation_email(participant, timestamp_experiment):
     participant.invitation_send = True
     participant.invitation_send_when = timezone.now()
@@ -157,8 +167,10 @@ def send_invitation_email(participant, timestamp_experiment):
     link = settings.DOMAIN+f'/login?hash={participant.hash}'
     timestamp_experiment = timestamp_experiment
 
-    calendar_start_datetime = '20220112T200000Z'
-    calendar_end_datetime = '20220112T200000Z'
+    #This depends on the Time zone
+    offset_hours = 3
+
+    calendar_start_datetime, calendar_end_datetime = format_timestamp(timestamp_experiment, offset_hours)    
     calendar_details = ''
     calendar_title = ''
     link_mas_info_experiment = 'https://'
@@ -169,7 +181,7 @@ def send_invitation_email(participant, timestamp_experiment):
     context['link_more_info'] = settings.DOMAIN+'/info'
     context['timestamp_experiment'] = timestamp_experiment.astimezone()
     context['link_experiment'] = link
-    
+    context['link_google_event'] = "https://calendar.google.com/calendar/r/eventedit?text=Experiment&dates=" + calendar_start_datetime + "/" +calendar_end_datetime
     template_filename = os.path.join(settings.BASE_DIR,
                                      'templates/',
                                      'email_invitation.html')
