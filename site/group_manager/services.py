@@ -151,9 +151,9 @@ def create_bots_participants(bots_n):
     return bots_participants
 
 def format_timestamp(timestamp):    
-    date_obj = timestamp 
+    date_obj = timestamp
     formatted_timestamp = date_obj.strftime('%Y%m%dT%H%M%SZ')
-    date_obj_end = date_obj + timedelta(minutes=20)  
+    date_obj_end = date_obj + timedelta(minutes=20)
     formatted_timestamp_end= date_obj_end.strftime('%Y%m%dT%H%M%SZ')
     return formatted_timestamp, formatted_timestamp_end
 
@@ -183,7 +183,7 @@ def send_invitation_email(participant, timestamp_experiment):
                                      'email_invitation.html')
     template = get_template(template_filename)
     html = template.render(context)
-    datetime_subject = str(timestamp_experiment.astimezone()).split('.')[0][:-3]
+    datetime_subject = str(timestamp_experiment.astimezone()).split('.')[0][:-6]
     send_mail(f'Invitación: Experimento {participant.user.first_name} {participant.user.last_name} @ {datetime_subject}', '', f'Invitación Experimento<{settings.EMAIL}>', [email], html_message=html)
 
 
