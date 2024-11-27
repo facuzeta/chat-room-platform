@@ -10,18 +10,31 @@ import logging
 logger = logging.getLogger(__name__)
 # Create your models here.
 class Bot(models.Model): 
-    behaviour_nickname= models.CharField(max_length=128)   
+    #Behaviour nickname is shown to the manager when creating groups, chatroom nickname is shown in the chat.
+    behaviour_nickname= models.CharField(max_length=128)    
     chatroom_nickname = models.CharField(max_length=128,blank=True, null=True)
     make_random_nickname_on_create = models.BooleanField(default=True) 
-    system_prompt = models.TextField() 
-    reply_probability = models.FloatField(default=0.5, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])    
+
+    system_prompt = models.TextField()
     model = models.CharField(max_length=128)
+
+    reply_probability = models.FloatField(default=0.5, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])    
     poll_time = models.IntegerField(default=5)   
+
+    #If true, the bot nickname is informed of his own nickname
     know_own_nickname = models.BooleanField(default=True)
+
     use_current_topic = models.BooleanField(default=True)
+
+    #If true, the bot will use the full chat history, otherwise only the messages of the current topic
     use_all_chat_history = models.BooleanField(default=False)
+
+    #If use_time_left_threshold is true, the bot is informed if the time remaining is less than the threshold
     use_time_left_threshold = models.BooleanField(default=False)
     time_left_threshold = models.IntegerField(default=60)
+    
+    empty_replies_enabled = models.BooleanField(default=True)    
+
     temperature = models.FloatField(default=1.0, validators=[MinValueValidator(0.0), MaxValueValidator(2.0)])
     max_tokens = models.IntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(1000)])
 
@@ -67,7 +80,10 @@ class Bot(models.Model):
             information_lines.append("INFORMATION-CURRENT_TOPIC: " + current_question) 
 
         if(self.know_own_nickname):   
-            information_lines.append("INFORMATION-NAME: " + bot_nick)         
+            information_lines.append("INFORMATION-NAME: " + bot_nick)
+
+        if(self.empty_replies_enabled):
+            information_lines.append("You can send an empty reply wait for more input from other participant")
 
         system_message = "\n".join(information_lines + [self.system_prompt])
         messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history           
@@ -75,48 +91,56 @@ class Bot(models.Model):
 
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
-            api_key = os.environ["OPEN_AI_API_KEY"]
-            url = "https://api.openai.com/v1/chat/completions"
+            return self.send_message_openai_model(messages)            
 
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}"
-            }
-            payload = { "model": self.model, "messages" : messages ,"max_tokens": self.max_tokens, "temperature": self.temperature}
-            try:
-                response = requests.post(url, headers=headers, data=json.dumps(payload))
-                if response.status_code == 200:
-                    response_json = response.json()
-                    return messages, response_json['choices'][0]['message']['content'].strip()
-                else:
-                    logger.error(f"Error: {response.status_code}, {response.text}")
-                    return messages,""                
-            except Exception as e:
-                logger.error(f"Error: {e}")
-            return messages,""
-
-        #To use an external ollama, it should be named with "external_ollama" on it nickname
-        if "external_ollama" in self.behaviour_nickname:  
-            key = os.environ["EXTERNAL_OLLAMA_KEY"]
-            url = os.environ["EXTERNAL_OLLAMA_URL"]
-            headers = {
-                "Authorization": f"Bearer {key}"
-            }            
-            data = { "model": self.model, "messages" : messages, "stream": False}  
-            try:          
-                response = requests.post(url, headers=headers, json=data)   
-                if response.status_code == 200:  
-                    data_response = json.loads(response.text)                  
-                    return messages,data_response["message"]["content"]  
-                else:
-                    logger.error(f"Error: {response.status_code}, {response.text}")
-                    return messages,""                
-            except Exception as e:
-                logger.error(f"Error: {e}")
-            return messages,""
-                    
+        #We use "external_ollama_" in the model name to indicate we the ollama model is not hosted locally
+        if "external_ollama_" in self.model: 
+            return self.send_message_external_ollama_model(messages)             
         
-        #By default it will send to local ollama server
+        #By default it will send to local ollama server        
+        return self.send_message_local_ollama_model(messages)
+    
+    def send_message_openai_model(self, messages):
+        api_key = os.environ["OPEN_AI_API_KEY"]
+        url = "https://api.openai.com/v1/chat/completions"
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        }
+        payload = { "model": self.model, "messages" : messages ,"max_tokens": self.max_tokens, "temperature": self.temperature}
+        try:
+            response = requests.post(url, headers=headers, data=json.dumps(payload))
+            if response.status_code == 200:
+                response_json = response.json()
+                return messages, response_json['choices'][0]['message']['content'].strip()
+            else:
+                logger.error(f"Error: {response.status_code}, {response.text}")
+                return messages,""                
+        except Exception as e:
+            logger.error(f"Error: {e}")
+        return messages,""
+    
+    def send_message_external_ollama_model(self, messages):
+        key = os.environ["EXTERNAL_OLLAMA_KEY"]
+        url = os.environ["EXTERNAL_OLLAMA_URL"]
+        headers = {
+            "Authorization": f"Bearer {key}"
+        }            
+        data = { "model": self.model, "messages" : messages, "stream": False}  
+        try:          
+            response = requests.post(url, headers=headers, json=data)   
+            if response.status_code == 200:  
+                data_response = json.loads(response.text)                  
+                return messages,data_response["message"]["content"]  
+            else:
+                logger.error(f"Error: {response.status_code}, {response.text}")
+                return messages,""                
+        except Exception as e:
+            logger.error(f"Error: {e}")
+        return messages,""
+    
+    def send_message_local_ollama_model(self, messages):
         url = "http://localhost:11434/api/chat"
         data = { "model": self.model, "messages" : messages, "stream": False}                 
         try:          
