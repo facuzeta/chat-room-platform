@@ -181,8 +181,8 @@ class Stage(models.Model):
 
     def __str__(self): return self.name
 
-    def next(self):
-        stages_names = 'ws1 s1 s2_1 s2_2 s2_3 s2_4 s3 thanks'.split()
+    def next(self, experiment_stages_name):
+        stages_names = experiment_stages_name.split()
         dic = dict(zip(stages_names, stages_names[1:]))
         return Stage.objects.get(name=dic[self.name])
 
@@ -265,6 +265,8 @@ class Group(models.Model):
     def get_participants_status(self):
         return [(p, p.get_current_stage(), p.get_current_stage_timestart()) for p in self.participants.all()]
 
+    def get_experiment_stages(self):
+        return self.experiment.get_stages_names()
 
 
 class Experiment(models.Model):
@@ -281,6 +283,7 @@ class Experiment(models.Model):
         default=InputType.VALUE_AND_CONFIDENCE,        
     )
     instructions_s2 = models.TextField(default="", null=True, blank=True)
+    stages_names = models.CharField(max_length=128, default='ws1 s1 s2_1 s2_2 s2_3 s2_4 s3 thanks')
     history = HistoricalRecords()
 
     def __str__(self):
@@ -289,6 +292,8 @@ class Experiment(models.Model):
     def has_instructions_s2(self):
         return self.instructions_s2 != ""
 
+    def get_stages_names(self):
+        return self.stages_names
         
 
 class Question(models.Model):

@@ -49,14 +49,14 @@ def get_stage_and_change(participant):
     if current_stage.name in ['s1']:
         try:            
             if group.have_user_participants_completed(current_stage) or stage_timeout(participant, current_stage):
-                transition(participant, current_stage.next())
+                transition(participant, current_stage.next(group.get_experiment_stages()))
         except:
             #If he does not have group, back to ws1
             StageParticipant.objects.get(Participant=participant,Stage=current_stage).delete()
 
     if current_stage.name in [ 's2_1', 's2_2', 's2_3', 's2_4', 's3']:
         if stage_timeout(participant, current_stage):
-            transition(participant, current_stage.next())
+            transition(participant, current_stage.next(group.get_experiment_stages()))
 
     return participant.get_current_stage()
 
