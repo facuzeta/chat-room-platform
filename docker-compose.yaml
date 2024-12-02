@@ -1,7 +1,7 @@
 services: 
 
   websockets: 
-    image: chat-room-image:latest
+    build: ./site
     command: daphne -b 0.0.0.0 -p 8001 mysite.asgi:application
     ports:
       - 8001:8001
@@ -9,13 +9,13 @@ services:
       - redis
 
   celery:
-    image: chat-room-image:latest
+    build: ./site
     command: celery -A mysite worker --loglevel=INFO
     depends_on:
       - redis
 
   web:
-    image: chat-room-image:latest 
+    build: ./site
     command: gunicorn --access-logfile - --workers 5 --bind 0.0.0.0:8000 mysite.wsgi:application    
     volumes:
       - static_volume:${STATIC_DIR}
