@@ -294,6 +294,13 @@ class Experiment(models.Model):
 
     def get_stages_names(self):
         return self.stages_names
+    
+    def get_total_questions(self):
+        n_stages_with_questions = 0
+        for stage in (self.stages_names.split()):
+                if stage.startswith("s2_"):
+                    n_stages_with_questions += 1        
+        return n_stages_with_questions
         
 
 class Question(models.Model):

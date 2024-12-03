@@ -38,7 +38,9 @@ def celery_run_bot(self, data):
         #El bot checkea el chat y responde mientras esten en stage de conversacion
         if bot_current_stage.name != 's3'and group != None:
             bot_current_stage = get_stage_and_change(bot)
-            if bot_current_stage.name in ['s2_1', 's2_2', 's2_3', 's2_4']:    
+            total_question = group.experiment.get_total_questions()
+            s2_stages = [f"s2_{i}" for i in range(1, total_question+1)]
+            if bot_current_stage.name in s2_stages:    
                                     
                 if bot.bot.reply_probability > random.uniform(0, 1):
                     print("Bot coin flip success, calling response")                   

@@ -141,6 +141,7 @@ def home(request):
         context["question_order_s2"] = participant.group.question_order_s2
         context["group_name"] = participant.group.name
         context['experiment_input_type'] = participant.group.experiment.input_type
+        context['question_total'] = str(participant.group.experiment.get_total_questions())
     return render(request, "index_participant.html", context)
 
 

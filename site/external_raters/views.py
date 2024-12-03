@@ -77,7 +77,9 @@ def create_external_rater(request, hash):
 
     # crea todas las ExternalRatevalue con valores vacios
     for group in groups_to_rate:
-        for stage in Stage.objects.filter(name__in="s2_1 s2_2 s2_3 s2_4".split()):
+        total_questions = group.experiment.get_total_questions()
+        s2_stages = [f"s2_{i}" for i in range(1, total_questions+1)]
+        for stage in Stage.objects.filter(name__in=s2_stages):
             # si el chat es vacio no lo sumo
             if len(Chat.objects.filter(participant__group=group, stage=stage)) > 0:
                 ExternalRateValue.objects.create(stage=stage, group=group, rater=er)

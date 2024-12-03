@@ -37,7 +37,7 @@ def get_stage_and_change(participant):
 
     if current_stage.name == 'ws1':
         # no hago nada porque de ws1 me saca un admin
-        pass
+        return current_stage
 
     # if current_stage.name == 'ws2':
     #     group = participant.group
@@ -53,8 +53,12 @@ def get_stage_and_change(participant):
         except:
             #If he does not have group, back to ws1
             StageParticipant.objects.get(Participant=participant,Stage=current_stage).delete()
-
-    if current_stage.name in [ 's2_1', 's2_2', 's2_3', 's2_4', 's3']:
+        return participant.get_current_stage()
+    
+    total_questions = group.experiment.get_total_questions()
+    s2_stages = [f"s2_{i}" for i in range(1, total_questions+1)]
+    stages = s2_stages + ["s3"]    
+    if current_stage.name in stages:
         if stage_timeout(participant, current_stage):
             transition(participant, current_stage.next(group.get_experiment_stages()))
 
@@ -73,14 +77,17 @@ def stage_timeout(participant, stage):
 def create_question_order(experiment):
     questions = [{'question_id': q.id, 'text': q.text}
                  for q in (Question.objects.filter(experiment=experiment))]
+    
+    n_experiment_questions = experiment.get_total_questions()
 
-
+    if len(questions) < n_experiment_questions:
+        raise Exception("Not enough questions for that experiment")
     # comment shuffling to repeat experimental desing from tedx
     random.shuffle(questions)
     questions_new_order = list(questions)
-
+    
     random.shuffle(questions)
-    questions_new_order_s2 = questions[:4]
+    questions_new_order_s2 = questions[:n_experiment_questions]
 
     return questions_new_order, questions_new_order_s2
 

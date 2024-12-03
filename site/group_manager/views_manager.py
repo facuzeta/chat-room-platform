@@ -247,7 +247,9 @@ def run_bots(request):
 
 def create_expert_answers_with_valuation(user, group):
     res = []
-    for stage_name in 's2_1 s2_2 s2_3 s2_4'.split():
+    total_question = group.experiment.get_total_questions()
+    s2_stages = [f"s2_{i}" for i in range(1, total_question+1)]
+    for stage_name in s2_stages:
         query = ChatExpertEvaluatioAnswer.objects.filter(group=group,user=user, stage__name=stage_name)
 
         list_of_questions_and_answers = []
@@ -271,7 +273,9 @@ def group_status(request, group_id):
     group = Group.objects.get(id=group_id)
     context['group'] = group
     context['cms'] = get_cms()
-    context['chats'] = [(Chat.objects.filter(participant__group=group, stage__name=s).order_by('timestamp'), s, questions_and_answers) for s, questions_and_answers in zip('s2_1 s2_2 s2_3 s2_4'.split(), create_expert_answers_with_valuation(request.user, group))]
+    total_questions = group.experiment.get_total_questions()
+    s2_stages = [f"s2_{i}" for i in range(1, total_questions+1)]
+    context['chats'] = [(Chat.objects.filter(participant__group=group, stage__name=s).order_by('timestamp'), s, questions_and_answers) for s, questions_and_answers in zip(s2_stages, create_expert_answers_with_valuation(request.user, group))]
     return render(request, 'group_status.html', context)
 
 
@@ -427,8 +431,9 @@ def export_all(request):
                 }
                 r_group['expert_answers_valuations'].append(r)
             except: pass
-
-        chats = {s: [clean_dic_to_serialize(vars(d)) for d in Chat.objects.filter(participant__group=group, stage__name=s).order_by('timestamp')] for s in 's2_1 s2_2 s2_3 s2_4'.split()}
+        total_questions = group.experiment.get_total_questions()
+        s2_stages = [f"s2_{i}" for i in range(1, total_questions+1)]
+        chats = {s: [clean_dic_to_serialize(vars(d)) for d in Chat.objects.filter(participant__group=group, stage__name=s).order_by('timestamp')] for s in s2_stages.split()}
         r_group['chats'] = chats
         res.append(r_group)
 
