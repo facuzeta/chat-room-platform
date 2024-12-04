@@ -266,7 +266,7 @@ class Group(models.Model):
         return [(p, p.get_current_stage(), p.get_current_stage_timestart()) for p in self.participants.all()]
 
     def get_experiment_stages(self):
-        return self.experiment.get_stages_names()
+        return self.experiment.get_stage_names()
 
 
 class Experiment(models.Model):
@@ -283,7 +283,8 @@ class Experiment(models.Model):
         default=InputType.VALUE_AND_CONFIDENCE,        
     )
     instructions_s2 = models.TextField(default="", null=True, blank=True)
-    stages_names = models.CharField(max_length=128, default='ws1 s1 s2_1 s2_2 s2_3 s2_4 s3 thanks')
+    stage_names = models.CharField(max_length=128, default='ws1 s1 s2_1 s2_2 s2_3 s2_4 s3 thanks')
+    num_questions_s1= models.IntegerField(default=-1)
     history = HistoricalRecords()
 
     def __str__(self):
@@ -292,15 +293,18 @@ class Experiment(models.Model):
     def has_instructions_s2(self):
         return self.instructions_s2 != ""
 
-    def get_stages_names(self):
-        return self.stages_names
+    def get_stage_names(self):
+        return self.stage_names
     
     def get_total_questions(self):
         n_stages_with_questions = 0
-        for stage in (self.stages_names.split()):
+        for stage in (self.stage_names.split()):
                 if stage.startswith("s2_"):
                     n_stages_with_questions += 1        
         return n_stages_with_questions
+    
+    def get_num_questions_s1(self):
+        return self.num_questions_s1
         
 
 class Question(models.Model):

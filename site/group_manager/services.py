@@ -79,14 +79,20 @@ def create_question_order(experiment):
                  for q in (Question.objects.filter(experiment=experiment))]
     
     n_experiment_questions = experiment.get_total_questions()
-
+    n_questions_s1= experiment.get_num_questions_s1()
+    if n_questions_s1 == -1:
+        n_questions_s1 = len(questions)
+        
     if len(questions) < n_experiment_questions:
         raise Exception("Not enough questions for that experiment")
+    
+    if n_questions_s1 < n_experiment_questions:
+        raise Exception("Not enough questions asked in s1")
     # comment shuffling to repeat experimental desing from tedx
     random.shuffle(questions)
-    questions_new_order = list(questions)
+    questions_new_order = list(questions[:n_questions_s1])
     
-    random.shuffle(questions)
+    random.shuffle(questions[:n_questions_s1])
     questions_new_order_s2 = questions[:n_experiment_questions]
 
     return questions_new_order, questions_new_order_s2

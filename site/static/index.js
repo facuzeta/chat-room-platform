@@ -392,6 +392,7 @@ function render_next_step_s2(stage_name) {
     
     $("#stage_s2__answered_confidence").html(confidence);
     $("#stage_s2__number_question_of").html(i + 1);
+    $("#stage_s2__total_question_of").html(question_order_s2.length);
     $("#step_s2_controlls").show()
 
     add_trigger_to_chat(trigger);
