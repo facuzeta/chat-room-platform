@@ -45,7 +45,7 @@ def celery_run_bot(self, data):
                 if bot.bot.reply_probability > random.uniform(0, 1):
                     print("Bot coin flip success, calling response")                   
                     context, bot_response = bot.message_bot()                 
-                    print("Got this response [" + bot_response + "], sending it to chat")                      
+                    print("Got this response" + bot_response)                      
                     #Si el LLM tarda mucho en hacer la respuesta y cambia el stage, no manda el mensaje
                     stage_after_think = get_stage_and_change(bot)
                     if bot_current_stage == stage_after_think:                        
@@ -81,6 +81,7 @@ def celery_run_bot(self, data):
     except Exception:
               
         bot.toggle_polling()
+        raise Exception
 
 
     

@@ -77,8 +77,8 @@ class Participant(models.Model):
 
     def message_bot(self):
         if self.is_bot:            
-            bot_response = self.bot.send_message(self)
-            return bot_response
+            context, bot_response = self.bot.send_message(self)
+            return context, bot_response
         
     def get_nickname(self):
         if (self.nickname is None) or len(self.nickname) < 2:
@@ -285,6 +285,7 @@ class Experiment(models.Model):
     instructions_s2 = models.TextField(default="", null=True, blank=True)
     stage_names = models.CharField(max_length=128, default='ws1 s1 s2_1 s2_2 s2_3 s2_4 s3 thanks')
     num_questions_s1= models.IntegerField(default=-1)
+    context_prompt = models.TextField(default="", null=True, blank=True)
     history = HistoricalRecords()
 
     def __str__(self):
@@ -305,6 +306,9 @@ class Experiment(models.Model):
     
     def get_num_questions_s1(self):
         return self.num_questions_s1
+    
+    def get_context_prompt(self):
+        return self.context_prompt
         
 
 class Question(models.Model):

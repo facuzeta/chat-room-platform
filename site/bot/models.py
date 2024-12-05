@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 import requests
 import json
 from simple_history.models import HistoricalRecords
-from group_manager.models import Participant
+from group_manager.models import Participant, Group,Experiment
 import os 
 import logging
 
@@ -51,16 +51,20 @@ class Bot(models.Model):
         already_debated_questions_text=[question["text"] for question in questions[:current_stage_n-1]]
         current_question = questions[current_stage_n-1]["text"]
         remaining_time = bot_participant.get_remaining_time()
+
+        experiment_context = bot_participant.group.experiment.get_context_prompt()
         
         #mock ups
         if(self.model == "mockup_repeat"):
             if len(chat_history)>0:
                 last_msg = chat_history[-1]["content"]
                 return [last_msg], last_msg
-            return [last_msg], "hello"
+            return [], "hello"
              
         if (self.model == "mockup_hello"):
-            return [last_msg], "hello"
+            if len(chat_history)>0:
+                last_msg = chat_history[-1]["content"]
+            return [], "hello"
         
         messages=[]
 
@@ -84,6 +88,10 @@ class Bot(models.Model):
 
         if(self.empty_replies_enabled):
             information_lines.append("You can send an empty reply wait for more input from other participant")
+
+        if(experiment_context != ""):
+            information_lines.append("INFORMATION-EXPERIMENT-CONTEXT: " + experiment_context)
+
 
         system_message = "\n".join(information_lines + [self.system_prompt])
         messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history           
