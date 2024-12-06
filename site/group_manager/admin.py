@@ -84,7 +84,7 @@ class ChatExpertEvaluatioAnswerAdmin(admin.ModelAdmin):
 
 @admin.register(Experiment)
 class ExperimentAdmin(SimpleHistoryAdmin):
-    list_display = ("name","input_type", "instructions_s2")
+    list_display = ("name","input_type", "instructions_s2", "num_questions_s1","context_prompt")
 
 
 for model in apps.get_app_config("group_manager").models.values():
