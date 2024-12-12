@@ -6,19 +6,25 @@ services:
     ports:
       - 8001:8001
     depends_on:
+      - db
       - redis
 
   celery:
     build: ./site
     command: celery -A mysite worker --loglevel=INFO
     depends_on:
+      - db
       - redis
 
   web:
     build: ./site
-    command: gunicorn --access-logfile - --workers 5 --bind 0.0.0.0:8000 mysite.wsgi:application    
+    command: sh -c "python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput && python3 manage.py createsuperuser --noinput && python3 manage.py collectstatic --noinput && python manage.py loaddata ./group_manager/fixtures/data_for_spanish_experiments.json && python manage.py loaddata ./group_manager/fixtures/data_for_spanish_experiments.json && python manage.py loaddata ./cms/fixtures/data_for_spanish_setup.json && gunicorn --access-logfile - --workers 5 --bind 0.0.0.0:8000 mysite.wsgi:application "   
     volumes:
       - static_volume:${STATIC_DIR}
+    environment:
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
     ports:
       - 8000:8000
     depends_on:
@@ -34,9 +40,13 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - 5432:5432
 
   redis:
-    image: "redis:latest" 
+    image: "redis:latest"
+    ports:
+      - 6379:6379
     
 
 volumes:
