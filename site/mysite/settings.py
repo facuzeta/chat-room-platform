@@ -23,7 +23,7 @@ environ.Env.read_env()
 DEBUG = env('DEBUG')
 
 
-ENV_BEANSTALK = 'RDS_PORT' in os.environ
+ENV_BEANSTALK = 'POSTGRES_PORT' in os.environ
 if ENV_BEANSTALK:
     SECURE_SSL_REDIRECT = True
     SECURE_REDIRECT_EXEMPT = [r'^no-ssl/$',r'^no-ssl$',]
@@ -106,11 +106,11 @@ if ENV_BEANSTALK:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['RDS_DB_NAME'],
-            'USER': os.environ['RDS_USERNAME'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
-            'HOST': os.environ['RDS_HOSTNAME'],
-            'PORT': os.environ['RDS_PORT'],
+            'NAME': os.environ['POSTGRES_DB_NAME'],
+            'USER': os.environ['POSTGRES_USERNAME'],
+            'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+            'HOST': os.environ['POSTGRES_HOSTNAME'],
+            'PORT': os.environ['POSTGRES_PORT'],
         }
     }
 else:
@@ -179,7 +179,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-           "hosts": [('127.0.0.1', 6379)],
+           "hosts": [(env('REDIS_HOST'), env('REDIS_PORT'))],
         },
     },
 
@@ -189,9 +189,9 @@ CHANNEL_LAYERS = {
     #}
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = env('CELERY_BROKER')
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND = env('CELERY_BROKER')
 
 DOMAIN = os.environ['DOMAIN']
 
