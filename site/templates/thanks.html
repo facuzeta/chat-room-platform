@@ -71,7 +71,10 @@
 
     <div style=' text-align:center;    margin-top: 30%; color:white'>
         <div style='width: 100%;font-weight:bold;font-size:34px'>¡Gracias por participar!</div>
- 
+        {% if cms.feedback_form_link %}
+        <div style='width: 100%;font-weight:bold;font-size:34px'>Siga el este link para ir a la encuesta final y terminar el experimento</div>  
+        <a href="{{cms.feedback_form_link}}">Completar encuesta</a>
+        {% endif %}
 
     </div>
 
