@@ -87,7 +87,7 @@ class Bot(models.Model):
             information_lines.append("INFORMATION-NAME: " + bot_nick)
 
         if(self.empty_replies_enabled):
-            information_lines.append("INFORMATION-MESSAGE-IS-OPTIONAL: You can send an empty reply")
+            information_lines.append("INFORMATION-MESSAGE-IS-OPTIONAL: You can send an empty reply by sending <EMPTY/>")
 
         if(experiment_context != ""):
             information_lines.append("INFORMATION-EXPERIMENT-CONTEXT: " + experiment_context)

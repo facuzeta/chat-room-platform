@@ -46,7 +46,7 @@ def celery_run_bot(self, data):
                     print("Got this response" + bot_response)                      
                     #Si el LLM tarda mucho en hacer la respuesta y cambia el stage, no manda el mensaje
                     stage_after_think = get_stage_and_change(bot)
-                    if bot_current_stage == stage_after_think and bot_response != "":                       
+                    if bot_current_stage == stage_after_think and bot_response != "" and bot_response != "<EMPTY/>":                       
                         store_bot_chat(bot, bot_current_stage, bot_response, context) 
                         color = bot.get_color() 
                         try: 
