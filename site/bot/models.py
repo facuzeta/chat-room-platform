@@ -51,7 +51,6 @@ class Bot(models.Model):
         already_debated_questions_text=[question["text"] for question in questions[:current_stage_n-1]]
         current_question = questions[current_stage_n-1]["text"]
         remaining_time = bot_participant.get_remaining_time()
-
         experiment_context = bot_participant.group.experiment.get_context_prompt()
         
         #mock ups
@@ -87,22 +86,20 @@ class Bot(models.Model):
             information_lines.append("INFORMATION-NAME: " + bot_nick)
 
         if(self.empty_replies_enabled):
-            information_lines.append("You can send an empty reply wait for more input from other participant")
+            information_lines.append("INFORMATION-MESSAGE-IS-OPTIONAL: You can send an empty reply")
 
         if(experiment_context != ""):
             information_lines.append("INFORMATION-EXPERIMENT-CONTEXT: " + experiment_context)
 
 
-        system_message = "\n".join(information_lines + [self.system_prompt])
-        messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history           
-        
-
+        system_message = "\n ".join(information_lines)
+        messages = messages + [{"role" : "system", "content" :system_message}] + ["INSTRUCTIONS: " + self.system_prompt] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
             return self.send_message_openai_model(messages)            
 
         #We use "external_ollama_" in the model name to indicate we the ollama model is not hosted locally
-        if "external_ollama_" in self.model: 
+        if "external_ollama_" in self.model:
             return self.send_message_external_ollama_model(messages)             
         
         #By default it will send to local ollama server        
