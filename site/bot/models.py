@@ -51,6 +51,7 @@ class Bot(models.Model):
         already_debated_questions_text=[question["text"] for question in questions[:current_stage_n-1]]
         current_question = questions[current_stage_n-1]["text"]
         remaining_time = bot_participant.get_remaining_time()
+
         experiment_context = bot_participant.group.experiment.get_context_prompt()
         
         #mock ups
@@ -93,7 +94,7 @@ class Bot(models.Model):
 
 
         system_message = "\n ".join(information_lines)
-        messages = messages + [{"role" : "system", "content" :system_message}] + ["INSTRUCTIONS: " + self.system_prompt] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history
+        messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
             return self.send_message_openai_model(messages)            
