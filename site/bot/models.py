@@ -94,7 +94,7 @@ class Bot(models.Model):
 
 
         system_message = "\n ".join(information_lines)
-        messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history
+        messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history + [{"role" : "system", "content" : "<CHAT PAUSE>"}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}]
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
             return self.send_message_openai_model(messages)            
