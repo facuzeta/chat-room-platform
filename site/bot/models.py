@@ -6,6 +6,7 @@ from simple_history.models import HistoricalRecords
 from group_manager.models import Participant, Group,Experiment
 import os 
 import logging
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 # Create your models here.
@@ -32,6 +33,8 @@ class Bot(models.Model):
     #If use_time_left_threshold is true, the bot is informed if the time remaining is less than the threshold
     use_time_left_threshold = models.BooleanField(default=False)
     time_left_threshold = models.IntegerField(default=60)
+
+    use_defined_arguments = models.BooleanField(default=True)
     
     empty_replies_enabled = models.BooleanField(default=True)    
 
@@ -39,6 +42,8 @@ class Bot(models.Model):
     max_tokens = models.IntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(1000)])
 
     history = HistoricalRecords()
+    def __str__(self): return str(self.id)+' '+self.behaviour_nickname
+    
     def send_message(self, bot_participant):
         #Gets all bot_participant relevant data
         bot_nick = bot_participant.get_nickname()
@@ -50,8 +55,11 @@ class Bot(models.Model):
         
         already_debated_questions_text=[question["text"] for question in questions[:current_stage_n-1]]
         current_question = questions[current_stage_n-1]["text"]
+        arguments_for_question = Argument.objects.filter(
+            Q(question_id=questions[current_stage_n-1]["question_id"],bot = self) |
+            Q(question_id=questions[current_stage_n-1]["question_id"], bot__isnull=True))
         remaining_time = bot_participant.get_remaining_time()
-
+        
         experiment_context = bot_participant.group.experiment.get_context_prompt()
         
         #mock ups
@@ -91,9 +99,13 @@ class Bot(models.Model):
 
         if(experiment_context != ""):
             information_lines.append("INFORMATION-EXPERIMENT-CONTEXT: " + experiment_context)
-
-
-        system_message = "\n ".join(information_lines)
+        
+        if(self.use_defined_arguments):
+            for arg in arguments_for_question:
+                information_lines.append("INFORMATION-ARGUMENTS_FOR_CURRENT_TOPIC: " + arg.argument_text)
+            
+        
+        system_message = "\n ".join(information_lines)        
         messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history + [{"role" : "system", "content" : "<CHAT PAUSE>"}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}]
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
@@ -160,3 +172,9 @@ class Bot(models.Model):
         except Exception as e:
             logger.error(f"Error: {e}")
         return messages,""
+    
+class Argument(models.Model):
+    argument_text=models.TextField()
+    question = models.ForeignKey('group_manager.Question', on_delete=models.SET_NULL, null=True)
+    bot = models.ForeignKey('Bot', on_delete=models.SET_NULL, null=True, blank=True)
+    history = HistoricalRecords()

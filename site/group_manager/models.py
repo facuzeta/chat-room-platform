@@ -315,6 +315,7 @@ class Question(models.Model):
     text = models.CharField(max_length=256)
     experiment = models.ForeignKey(Experiment, on_delete=models.SET_NULL, null=True)
     history = HistoricalRecords()
+    def __str__(self): return str(self.id)+' '+self.text
 
 class Chat(models.Model):
     text = models.CharField(max_length=2048)
