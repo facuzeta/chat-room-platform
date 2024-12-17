@@ -100,7 +100,7 @@ class Bot(models.Model):
         if(experiment_context != ""):
             information_lines.append("INFORMATION-EXPERIMENT-CONTEXT: " + experiment_context)
         
-        if(self.use_defined_arguments):
+        if(self.use_defined_arguments and self.use_current_topic):
             for arg in arguments_for_question:
                 information_lines.append("INFORMATION-ARGUMENTS_FOR_CURRENT_TOPIC: " + arg.argument_text)
             

@@ -164,10 +164,11 @@ The available attributes to configure the bot are the following:
 -**Use all chat history**: If enabled, all the messages in chat history is used when creating replies. Otherwise only recent the messages of the current topic are used.  
 -**Use time left threshold**: If enabled, a system prompt is added if the time left for current topic debate is less than the defined time left threshold. It can be used with the System Prompt attribute to have different replies when closer to the end of debate.  
 -**Time left Threshold**: The time in seconds that will define when the current debate is close to end. Only matters if Use time left threshold is enabled.  
+-**Use defined arguments**: If enabled, a list of arguments for the bot to use in debate is added to the prompt specific of the current topic. Use current topic must be enabled to be used.
 -**Empty replies enabled**: If enabled, a system prompt is added which encourage the LLM to give empty replies. The same effect could be achieved by giving similar instructions on the System Prompt attribute.  
--**Temperature**: An hyperpatameter for the LLM that controls the randomness of the reply. Used in OpenAI models.  
+-**Temperature**: An hyperparameter for the LLM that controls the randomness of the reply. Used in OpenAI models.  
 -**Max tokens**: Limit the number of tokens the model has to generate the reply.
 
-
+Arguments can be created for a question, and can have also a bot defined. By default every argument of a question is used by every bot when the question is being debated, but if the bot is defined only that bot will use it. This way you can run an experiment with two bots with different configurations, where each bot use different arguments for the same question, but also have some arguments in common.
 
 ### Extras:
