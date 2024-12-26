@@ -687,7 +687,7 @@ function consensus_checkbox_change() {
             <label style='color:black'>La posición grupal con respecto a este frase fue:</label>
             <label id="consensus_value_value" class='slider_value'></label>
             <input type="range" min="0" max="10" step="1" value="" id="consensus_value"
-             class="question_input_number_class_input slider_agreement_transparente" 
+             class="question_input_number_class_input" 
              onchange="javascript:slider_agreement_do_visible('consensus_value')">
              <span style='color:#6abc3a;float:left'>Nada</span>
              <span style='color:#6abc3a;float:right'>Mucho</span>
