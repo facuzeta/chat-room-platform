@@ -60,6 +60,7 @@ class Participant(models.Model):
         group_chat = group_manager.models.Chat.objects.filter(participant__group=self.group).order_by('timestamp')
         previous_messages = []
         messages= []
+        last_message_difference_in_seconds = 0
         for c in group_chat.all():
             if c.participant == self:
                 msg = {"role":"assistant", "content": c.text}
@@ -73,7 +74,9 @@ class Participant(models.Model):
                 previous_messages.append(msg)
             else:
                 messages.append(msg)
-        return previous_messages, messages
+            current_time = timezone.now()
+            last_message_difference_in_seconds = (current_time - c.timestamp).total_seconds()
+        return previous_messages, messages, last_message_difference_in_seconds
 
     def message_bot(self):
         if self.is_bot:            

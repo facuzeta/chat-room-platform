@@ -7,6 +7,7 @@ from group_manager.models import Participant, Group,Experiment
 import os 
 import logging
 from django.db.models import Q
+from bot.services import *
 
 logger = logging.getLogger(__name__)
 # Create your models here.
@@ -35,7 +36,13 @@ class Bot(models.Model):
     time_left_threshold = models.IntegerField(default=60)
 
     use_defined_arguments = models.BooleanField(default=True)
-    
+
+    wait_reply_to_generate_again = models.BooleanField(default=True)
+
+    send_message_if_chat_inactive = models.BooleanField(default=True)
+    time_chat_inactivity = models.IntegerField(default=60)
+    chat_inactive_message_prompt = models.TextField(default="")
+
     empty_replies_enabled = models.BooleanField(default=True)    
 
     temperature = models.FloatField(default=1.0, validators=[MinValueValidator(0.0), MaxValueValidator(2.0)])
@@ -49,7 +56,7 @@ class Bot(models.Model):
         #Gets all bot_participant relevant data
         bot_nick = bot_participant.get_nickname()
 
-        chat_history_prev, chat_history= bot_participant.get_chat_history()   
+        chat_history_prev, chat_history, last_message_difference_in_seconds= bot_participant.get_chat_history()   
 
         current_stage_n = int(bot_participant.get_current_stage().name.split('_')[-1]) 
         questions = bot_participant.get_questions_order()
@@ -62,6 +69,13 @@ class Bot(models.Model):
         remaining_time = bot_participant.get_remaining_time()
         
         experiment_context = bot_participant.group.experiment.get_context_prompt()
+
+        
+        chat_inactive = last_message_difference_in_seconds > self.time_chat_inactivity and self.sent_message_if_chat_inactive
+        #Don't generate two replies consecutively, if chat was inactive it generate reply anyways
+        last_message_was_sent_by_assistant = (len(chat_history) > 0) and chat_history[-1]["role"] == "assistant"
+        if self.wait_reply_to_generate_again and last_message_was_sent_by_assistant and not chat_inactive:
+            return [], ""       
         
         #mock ups
         if(self.model == "mockup_repeat"):
@@ -108,71 +122,23 @@ class Bot(models.Model):
         
         system_message = "\n ".join(information_lines)        
         messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history
+        
+        #If chat is inactive we add a message to reactivate chat
+        if self.sent_message_if_chat_inactive and self.chat_inactive_message_prompt != "":
+            messages = messages + [{"role" : "system", "content" : self.chat_inactive_message_prompt}]
+
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
-            return self.send_message_openai_model(messages)            
+            return send_message_openai_model(messages)            
 
         #We use "external_ollama_" in the model name to indicate we the ollama model is not hosted locally
         if "external_ollama_" in self.model:
-            return self.send_message_external_ollama_model(messages)             
+            return send_message_external_ollama_model(messages)             
         
         #By default it will send to local ollama server        
-        return self.send_message_local_ollama_model(messages)
+        return send_message_local_ollama_model(messages)
     
-    def send_message_openai_model(self, messages):
-        api_key = os.environ["OPEN_AI_API_KEY"]
-        url = "https://api.openai.com/v1/chat/completions"
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}"
-        }
-        payload = { "model": self.model, "messages" : messages ,"max_tokens": self.max_tokens, "temperature": self.temperature}
-        try:
-            response = requests.post(url, headers=headers, data=json.dumps(payload))
-            if response.status_code == 200:
-                response_json = response.json()
-                return messages, response_json['choices'][0]['message']['content'].strip()
-            else:
-                logger.error(f"Error: {response.status_code}, {response.text}")
-                return messages,""                
-        except Exception as e:
-            logger.error(f"Error: {e}")
-        return messages,""
     
-    def send_message_external_ollama_model(self, messages):
-        key = os.environ["EXTERNAL_OLLAMA_KEY"]
-        url = os.environ["EXTERNAL_OLLAMA_URL"]
-        headers = {
-            "Authorization": f"Bearer {key}"
-        }            
-        data = { "model": self.model, "messages" : messages, "stream": False}  
-        try:          
-            response = requests.post(url, headers=headers, json=data)   
-            if response.status_code == 200:  
-                data_response = json.loads(response.text)                  
-                return messages,data_response["message"]["content"]  
-            else:
-                logger.error(f"Error: {response.status_code}, {response.text}")
-                return messages,""                
-        except Exception as e:
-            logger.error(f"Error: {e}")
-        return messages,""
-    
-    def send_message_local_ollama_model(self, messages):
-        url = "http://localhost:11434/api/chat"
-        data = { "model": self.model, "messages" : messages, "stream": False}                 
-        try:          
-                response = requests.post(url, json=data)   
-                if response.status_code == 200:  
-                    data_response = json.loads(response.text)                  
-                    return messages, data_response["message"]["content"]  
-                else:
-                    logger.error(f"Error: {response.status_code}, {response.text}")
-                    return messages,""                
-        except Exception as e:
-            logger.error(f"Error: {e}")
-        return messages,""
     
 class Argument(models.Model):
     argument_text=models.TextField()
