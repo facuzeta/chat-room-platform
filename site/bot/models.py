@@ -42,6 +42,7 @@ class Bot(models.Model):
     max_tokens = models.IntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(1000)])
 
     history = HistoricalRecords()
+    
     def __str__(self): return str(self.id)+' '+self.behaviour_nickname
     
     def send_message(self, bot_participant):
@@ -106,7 +107,7 @@ class Bot(models.Model):
             
         
         system_message = "\n ".join(information_lines)        
-        messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history + [{"role" : "system", "content" : "<CHAT PAUSE>"}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}]
+        messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
             return self.send_message_openai_model(messages)            
