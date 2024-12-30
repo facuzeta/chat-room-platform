@@ -124,7 +124,7 @@ class Bot(models.Model):
         messages = messages + [{"role" : "system", "content" :system_message}] + [{"role" : "system", "content" : "INSTRUCTIONS: " + self.system_prompt}] + [{"role" : "system", "content" : "<STARTS CHAT>"}] + chat_history
         
         #If chat is inactive we add a message to reactivate chat
-        if self.sent_message_if_chat_inactive and self.chat_inactive_message_prompt != "":
+        if chat_inactive and self.chat_inactive_message_prompt != "":
             messages = messages + [{"role" : "system", "content" : self.chat_inactive_message_prompt}]
 
         #Send with OPENAI API
