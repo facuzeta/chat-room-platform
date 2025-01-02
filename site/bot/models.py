@@ -71,8 +71,8 @@ class Bot(models.Model):
         experiment_context = bot_participant.group.experiment.get_context_prompt()
 
         
-        chat_inactive = last_message_difference_in_seconds > self.time_chat_inactivity and self.sent_message_if_chat_inactive
-        #Don't generate two replies consecutively, if chat was inactive it generate reply anyways
+        chat_inactive = last_message_difference_in_seconds > self.time_chat_inactivity and self.send_message_if_chat_inactive
+        #Don't generate two replies consecutively, if chat was inactive it generates reply anyways
         last_message_was_sent_by_assistant = (len(chat_history) > 0) and chat_history[-1]["role"] == "assistant"
         if self.wait_reply_to_generate_again and last_message_was_sent_by_assistant and not chat_inactive:
             return [], ""       
