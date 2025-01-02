@@ -129,14 +129,14 @@ class Bot(models.Model):
 
         #Send with OPENAI API
         if self.model == "gpt-4o-mini" or self.model == "gpt-4o-mini-2024-07-18":
-            return send_message_openai_model(messages)            
+            return send_message_openai_model(self, messages)            
 
         #We use "external_ollama_" in the model name to indicate we the ollama model is not hosted locally
         if "external_ollama_" in self.model:
-            return send_message_external_ollama_model(messages)             
+            return send_message_external_ollama_model(self, messages)             
         
         #By default it will send to local ollama server        
-        return send_message_local_ollama_model(messages)
+        return send_message_local_ollama_model(self, messages)
     
     
     
