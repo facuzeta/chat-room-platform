@@ -6,7 +6,7 @@ This repository contains a Django project to host debate experiments.
 
 ## Prerequisites
 
-Make sure you have **Python 3.7+** installed. You can download it from [https://www.python.org/downloads/](https://www.python.org/downloads/).
+Make sure you have **Python 3.10+** installed. You can download it from [https://www.python.org/downloads/](https://www.python.org/downloads/).
 
 You’ll also need **pip**, Python’s package manager. It usually comes bundled with Python, but if it’s missing, you can install it by running:
 
