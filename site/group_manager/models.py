@@ -5,8 +5,6 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from dateutil.parser import parse
 from cms.models import Config
-from bot.services import send_message
-
 import group_manager.models
 COLORS = ['#D81B60', '#1E88E5', '#FFC107', '#2ebda5']
 
@@ -80,9 +78,10 @@ class Participant(models.Model):
             last_message_difference_in_seconds = (current_time - c.timestamp).total_seconds()
         return previous_messages, messages, last_message_difference_in_seconds
 
+
     def message_bot(self):
         if self.is_bot:            
-            context, bot_response = send_message(self.bot, self)
+            context, bot_response = self.bot.send_message(self)
             return context, bot_response
         
     def get_nickname(self):
