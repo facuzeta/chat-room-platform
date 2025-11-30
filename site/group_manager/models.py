@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from dateutil.parser import parse
 from cms.models import Config
+from bot.services import send_message
+
 import group_manager.models
 COLORS = ['#D81B60', '#1E88E5', '#FFC107', '#2ebda5']
 
@@ -63,10 +65,10 @@ class Participant(models.Model):
         last_message_difference_in_seconds = 0
         for c in group_chat.all():
             if c.participant == self:
-                msg = {"role":"assistant", "content": c.text}
+                msg = {"role":"assistant", "content": c.text, "participant": c.participant}
             else:                
                 cont = c.participant.get_nickname() + ":" + c.text
-                msg = {"role":"user", "content": cont}
+                msg = {"role":"user", "content": cont, "participant": c.participant}
             #For stage time we check the timestart of a user, because bots update stages when they poll only
             participants_in_group = [p for p in group_manager.models.Participant.objects.filter(group=self.group) if not(p.is_bot())]
             
@@ -80,7 +82,7 @@ class Participant(models.Model):
 
     def message_bot(self):
         if self.is_bot:            
-            context, bot_response = self.bot.send_message(self)
+            context, bot_response = send_message(self.bot, self)
             return context, bot_response
         
     def get_nickname(self):
