@@ -147,3 +147,33 @@ class Argument(models.Model):
     question = models.ForeignKey('group_manager.Question', on_delete=models.SET_NULL, null=True)
     bot = models.ForeignKey('Bot', on_delete=models.SET_NULL, null=True, blank=True)
     history = HistoricalRecords()
+
+
+
+def all_participants_talked(chat_history, participants_in_group):
+    """
+    chat_history: list of dicts like {"role": "user", "content": "...", "participant": participant_obj}
+    participants_in_group: queryset or iterable of Participant objects
+    """
+    # Convert participants_in_group to a set of participant IDs (or objects if hashable)
+    group_participants = set(participants_in_group)
+
+    # Find the last assistant message index
+    last_assistant_index = None
+    for i in range(len(chat_history) - 1, -1, -1):
+        if chat_history[i]["role"] == "assistant":
+            last_assistant_index = i
+            break
+
+    if last_assistant_index is None:
+        # No assistant message found → return False (or True depending on your logic)
+        return False
+
+    # Collect participants who talked after the last assistant
+    talked_after_assistant = set()
+    for msg in chat_history[last_assistant_index + 1:]:
+        if msg["role"] == "user":
+            talked_after_assistant.add(msg["participant"])
+
+    # Check if all group participants are in talked_after_assistant
+    return talked_after_assistant == group_participants

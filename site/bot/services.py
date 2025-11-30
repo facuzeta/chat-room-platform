@@ -4,9 +4,6 @@ import logging
 import requests
 import json
 
-from bot.models import Argument, Bot
-from django.db.models import Q
-
 logger = logging.getLogger(__name__)
 
 def send_message_openai_model(bot, messages):
@@ -63,31 +60,3 @@ def send_message_local_ollama_model(bot, messages):
     except Exception as e:
         logger.error(f"Error: {e}")
     return messages,""
-
-def all_participants_talked(chat_history, participants_in_group):
-    """
-    chat_history: list of dicts like {"role": "user", "content": "...", "participant": participant_obj}
-    participants_in_group: queryset or iterable of Participant objects
-    """
-    # Convert participants_in_group to a set of participant IDs (or objects if hashable)
-    group_participants = set(participants_in_group)
-
-    # Find the last assistant message index
-    last_assistant_index = None
-    for i in range(len(chat_history) - 1, -1, -1):
-        if chat_history[i]["role"] == "assistant":
-            last_assistant_index = i
-            break
-
-    if last_assistant_index is None:
-        # No assistant message found → return False (or True depending on your logic)
-        return False
-
-    # Collect participants who talked after the last assistant
-    talked_after_assistant = set()
-    for msg in chat_history[last_assistant_index + 1:]:
-        if msg["role"] == "user":
-            talked_after_assistant.add(msg["participant"])
-
-    # Check if all group participants are in talked_after_assistant
-    return talked_after_assistant == group_participants
