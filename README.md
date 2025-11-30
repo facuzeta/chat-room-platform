@@ -4,6 +4,23 @@
 
 This repository contains a Django project to host debate experiments.
 
+## Prerequisites
+
+Make sure you have **Python 3.10+** installed. You can download it from [https://www.python.org/downloads/](https://www.python.org/downloads/).
+
+You’ll also need **pip**, Python’s package manager. It usually comes bundled with Python, but if it’s missing, you can install it by running:
+
+```bash
+python -m ensurepip --upgrade
+```
+Or in Linux or IOS:
+```bash
+sudo apt install python3-pip
+```
+```bash
+brew install python3
+```
+
 ### Installation
 
 1. Clone the repository: 
@@ -56,20 +73,6 @@ POSTGRES_PORT=5432 #Default Postgresql port
 
 ```
 
-If you are using the docker-compose file, also create a `.env` file in the folder `chat-room-platform`. It should have this Key-Value Pairs defined:
-
-```
-POSTGRES_USER="admin" #This variables should have the same values as the one in the previous .env
-POSTGRES_PASSWORD=
-POSTGRES_DB="chatroom"
-
-STATIC_DIR="/chat-room-platform/site"
-
-DJANGO_SUPERUSER_USERNAME= #The docker-compose will create a superuser with this variables
-DJANGO_SUPERUSER_PASSWORD=
-DJANGO_SUPERUSER_EMAIL=
-
-```
 
 2.  Create the database:
 
@@ -108,13 +111,6 @@ daphne -b 0.0.0.0 -p 8001 mysite.asgi:application
 ```
 celery -A mysite worker
 ```
-
-Optionally, you can use the docker-compose, which will host the page at port 8000. Enviroment variables may need some changes. To do so run this command on the "chat-room-platform" folder
-
-```
-docker-compose up
-```
-
 
 ## Site Guide:
 
@@ -171,4 +167,3 @@ The available attributes to configure the bot are the following:
 
 Arguments can be created for a question, and can have also a bot defined. By default every argument of a question is used by every bot when the question is being debated, but if the bot is defined only that bot will use it. This way you can run an experiment with two bots with different configurations, where each bot use different arguments for the same question, but also have some arguments in common.
 
-### Extras:
