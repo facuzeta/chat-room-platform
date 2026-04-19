@@ -193,20 +193,22 @@ CELERY_BROKER_URL = env('CELERY_BROKER')
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_RESULT_BACKEND = env('CELERY_BROKER')
 
-DOMAIN = os.environ['DOMAIN']
+DOMAIN = env('DOMAIN', default='localhost')
 
+EMAIL_ADDRESS = env('EMAIL_ADDRESS', default='')
+EMAIL = env('EMAIL', default='')
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = 'default from email'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_PORT = env('EMAIL_PORT')
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = env('EMAIL_USE_TLS')
 
-
-EMAIL_HOST = env('EMAIL_HOST') 
-EMAIL_PORT = env('EMAIL_PORT') 
-EMAIL_HOST_USER = env('EMAIL_HOST_USER') 
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = env('EMAIL_USE_TLS') 
-EMAIL_ADDRESS = env('EMAIL_ADDRESS')
-EMAIL = env('EMAIL')
+DEFAULT_FROM_EMAIL = EMAIL_ADDRESS
 
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 if not os.path.exists(LOG_DIR):

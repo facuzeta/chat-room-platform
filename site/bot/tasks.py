@@ -1,81 +1,70 @@
+import asyncio
+import logging
+import random
+
 from celery import shared_task
 from channels.layers import get_channel_layer
-import random
-from group_manager.services import *
-import asyncio
-import time
-import django
-import os
 
-def import_django_instance():
-    """
-    Makes django environment available 
-    to tasks!!
-    """
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
-    django.setup()
+from group_manager.services import get_stage_and_change, store_bot_chat
+
+logger = logging.getLogger(__name__)
+
 
 @shared_task(bind=True, max_retries=None)
 def celery_run_bot(self, data):
-    #celery puede recibir solo json data, para obtener el participante carga django y busca por id
-    import_django_instance()    
     from group_manager.models import Participant
-    pk = data.get('pk')
-    print("Bot participant"+ str(pk))
-    bot = Participant.objects.get(id=pk)
-    bot_current_stage = get_stage_and_change(bot)    
-    group = bot.group
-    room_group = "chat_"+ group.name       
+
+    pk = data.get("pk")
+    logger.info("Running bot for participant %s", pk)
+
+    bot_participant = Participant.objects.get(id=pk)
+    bot_current_stage = get_stage_and_change(bot_participant)
+    group = bot_participant.group
     channel_layer = get_channel_layer()
-    
-    try:
-        if group != None:
-            #El bot se queda en s1 hasta que todos los participantes terminen las encuestas 
-            if bot_current_stage.name == 's1':
-                print("Bot waiting for participants to end stage s1")
-                self.retry(args=[data], countdown=10,throw = False)  
 
-            #El bot checkea el chat y responde mientras esten en stage de conversacion                   
-            total_question = group.experiment.get_total_questions()
-            s2_stages = [f"s2_{i}" for i in range(1, total_question+1)]
-            if bot_current_stage.name in s2_stages:    
-                                    
-                if bot.bot.reply_probability > random.uniform(0, 1):
-                    print("Bot coin flip success, calling response")                   
-                    context, bot_response = bot.message_bot()                 
-                    print("Got this response" + bot_response)                      
-                    #Si el LLM tarda mucho en hacer la respuesta y cambia el stage, no manda el mensaje
-                    stage_after_think = get_stage_and_change(bot)
-                    if bot_current_stage == stage_after_think and bot_response != "" and bot_response != "<EMPTY/>":                       
-                        store_bot_chat(bot, bot_current_stage, bot_response, context) 
-                        color = bot.get_color() 
-                        try: 
-                            asyncio.run(channel_layer.group_send(
-                                room_group,
-                                {
-                                    'type': 'chat_message',
-                                    'message': bot_response,
-                                    'user': bot.nickname,
-                                    'color':  color,
-                                    'user_id':bot.bot.id,
-                                    'is_bot': True
-                                    # 'user': self.user.username+'('+str(self.user.id)+')'
-                                }
-                            ))
-                            
-                        except Exception:                                
-                            print("Exception ocurred when sending message to chat")                            
-                else:
-                    print("Bot coin flip failed")                
-                self.retry(args=[data], countdown=bot.bot.poll_time, throw = False)
-                
-            else:
-                #Esto es para dejar al bot en ultimo stage
-                get_stage_and_change(bot)
-    except Exception:
-              
-        bot.toggle_polling()
-        raise Exception
+    if group is None:
+        return
 
+    if bot_current_stage.name == "s1":
+        logger.info("Bot %s waiting for participants to finish s1", pk)
+        self.retry(args=[data], countdown=10, throw=False)
+        return
 
-    
+    total_questions = group.experiment.get_total_questions()
+    s2_stages = [f"s2_{i}" for i in range(1, total_questions + 1)]
+
+    if bot_current_stage.name in s2_stages:
+        if bot_participant.bot.reply_probability > random.uniform(0, 1):
+            logger.info("Bot %s sending response", pk)
+            context, bot_response = bot_participant.message_bot()
+            logger.info("Bot %s got response: %s", pk, bot_response)
+
+            stage_after_think = get_stage_and_change(bot_participant)
+            if (
+                bot_current_stage == stage_after_think
+                and bot_response
+                and bot_response != "<EMPTY/>"
+            ):
+                store_bot_chat(bot_participant, bot_current_stage, bot_response, context)
+                try:
+                    asyncio.run(
+                        channel_layer.group_send(
+                            f"chat_{group.name}",
+                            {
+                                "type": "chat_message",
+                                "message": bot_response,
+                                "user": bot_participant.nickname,
+                                "color": bot_participant.get_color(),
+                                "user_id": bot_participant.bot.id,
+                                "is_bot": True,
+                            },
+                        )
+                    )
+                except Exception:
+                    logger.exception("Failed to send bot message to WebSocket")
+        else:
+            logger.info("Bot %s skipped (reply probability)", pk)
+
+        self.retry(args=[data], countdown=bot_participant.bot.poll_time, throw=False)
+    else:
+        get_stage_and_change(bot_participant)

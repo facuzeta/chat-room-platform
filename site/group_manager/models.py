@@ -61,21 +61,19 @@ class Participant(models.Model):
         previous_messages = []
         messages= []
         last_message_difference_in_seconds = 0
+        human_participants = [p for p in group_manager.models.Participant.objects.filter(group=self.group) if not p.is_bot()]
+        stage_timestart = human_participants[0].get_current_stage_timestart() if human_participants else None
         for c in group_chat.all():
             if c.participant == self:
                 msg = {"role":"assistant", "content": c.text, "participant": c.participant}
-            else:                
+            else:
                 cont = c.participant.get_nickname() + ":" + c.text
                 msg = {"role":"user", "content": cont, "participant": c.participant}
-            #For stage time we check the timestart of a user, because bots update stages when they poll only
-            participants_in_group = [p for p in group_manager.models.Participant.objects.filter(group=self.group) if not(p.is_bot())]
-            
-            if participants_in_group[0].get_current_stage_timestart() > c.timestamp:
+            if stage_timestart is not None and stage_timestart > c.timestamp:
                 previous_messages.append(msg)
             else:
                 messages.append(msg)
-            current_time = timezone.now()
-            last_message_difference_in_seconds = (current_time - c.timestamp).total_seconds()
+            last_message_difference_in_seconds = (timezone.now() - c.timestamp).total_seconds()
         return previous_messages, messages, last_message_difference_in_seconds
 
 

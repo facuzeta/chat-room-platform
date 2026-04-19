@@ -1,8 +1,17 @@
-services: 
+services:
 
-  websockets: 
+  websockets:
     build: ./site
     command: daphne -b 0.0.0.0 -p 8001 mysite.asgi:application
+    env_file: .env
+    environment:
+      - POSTGRES_HOSTNAME=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=${POSTGRES_USER}
+      - POSTGRES_DB_NAME=${POSTGRES_DB}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER=redis://redis:6379/0
     ports:
       - 8001:8001
     depends_on:
@@ -12,26 +21,49 @@ services:
   celery:
     build: ./site
     command: celery -A mysite worker --loglevel=INFO
+    env_file: .env
+    environment:
+      - POSTGRES_HOSTNAME=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=${POSTGRES_USER}
+      - POSTGRES_DB_NAME=${POSTGRES_DB}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER=redis://redis:6379/0
     depends_on:
       - db
       - redis
 
   web:
     build: ./site
-    command: sh -c "python3 manage.py makemigrations --noinput && python3 manage.py migrate --noinput && python3 manage.py createsuperuser --noinput && python3 manage.py collectstatic --noinput && python manage.py loaddata ./group_manager/fixtures/data_for_spanish_experiments.json && python manage.py loaddata ./group_manager/fixtures/data_for_spanish_experiments.json && python manage.py loaddata ./cms/fixtures/data_for_spanish_setup.json && gunicorn --access-logfile - --workers 5 --bind 0.0.0.0:8000 mysite.wsgi:application "   
-    volumes:
-      - static_volume:${STATIC_DIR}
+    command: >
+      sh -c "python3 manage.py migrate --noinput &&
+             python3 manage.py createsuperuser --noinput || true &&
+             python3 manage.py collectstatic --noinput &&
+             python3 manage.py loaddata ./group_manager/fixtures/data_for_spanish_experiments.json &&
+             python3 manage.py loaddata ./cms/fixtures/data_for_spanish_setup.json &&
+             gunicorn --access-logfile - --workers 5 --bind 0.0.0.0:8000 mysite.wsgi:application"
+    env_file: .env
     environment:
+      - POSTGRES_HOSTNAME=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=${POSTGRES_USER}
+      - POSTGRES_DB_NAME=${POSTGRES_DB}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER=redis://redis:6379/0
       - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+    volumes:
+      - static_volume:${STATIC_DIR}
     ports:
       - 8000:8000
     depends_on:
-      - db      
+      - db
       - celery
       - websockets
-    
+
   db:
     image: postgres:latest
     volumes:
@@ -47,7 +79,7 @@ services:
     image: "redis:latest"
     ports:
       - 6379:6379
-    
+
 
 volumes:
   postgres_data:
