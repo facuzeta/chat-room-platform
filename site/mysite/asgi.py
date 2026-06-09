@@ -28,7 +28,7 @@ application = ProtocolTypeRouter({
     ),
  
 })
-# esto lo ejecuta ok daphne -b :: -p 5000  mysite.asgi:application
+# Run it with: daphne -b :: -p 5000 mysite.asgi:application
 
 
 # import os
@@ -40,4 +40,3 @@ application = ProtocolTypeRouter({
 # django.setup()
 
 # application = get_default_application()
-

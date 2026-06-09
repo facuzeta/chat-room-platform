@@ -134,9 +134,9 @@ def home(request):
 
     current_stage = participant.get_current_stage()
     if current_stage is not None and not current_stage.name == "ws1":
-        print("estoy dentro")
-        # ya empezo, osea que ya tiene definido variables
-        # y entro por que hizo refresh
+        print("inside")
+        # The experiment already started, so the group variables are set;
+        # we get here because the participant refreshed the page.
         context["question_order"] = participant.group.question_order
         context["question_order_s2"] = participant.group.question_order_s2
         context["group_name"] = participant.group.name

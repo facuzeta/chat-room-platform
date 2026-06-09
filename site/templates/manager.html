@@ -2,31 +2,31 @@
 {% block content %}
 
 <div style="padding:40px">
-    <h4>Botones rapidos</h4>
+    <h4>Quick actions</h4>
 
     <hr>
 
-    <h4>Seleccionadores</h4>
-  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_first_n_options(4)'>Seleccionar 4</a>
-  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_first_n_options(3)'>Seleccionar 3</a>
-  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_n_random(4)'>Seleccionar 4 al azar</a>
+    <h4>Selection tools</h4>
+  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_first_n_options(4)'>Select 4</a>
+  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_first_n_options(3)'>Select 3</a>
+  <a class="btn btn-secondary {% if forloop.first %} btn-info {% endif %}" href='javascript:select_n_random(4)'>Select 4 at random</a>
 <br>
 <br>
-<h4>Crear grupo</h4>
+<h4>Create group</h4>
 {% for e in experiment %}
-    <a class="btn btn-success {% if forloop.first %} btn-info {% endif %}" href='javascript:create_group_exp({{e.id}})'>Crear gurpo en exp <b>{{e.name}}</b></a>
+    <a class="btn btn-success {% if forloop.first %} btn-info {% endif %}" href='javascript:create_group_exp({{e.id}})'>Create group in experiment <b>{{e.name}}</b></a>
 {% endfor %}
 <br>
 <br>
-<h4>Participantes seleccionados</h4>
+<h4>Selected participants</h4>
     <div id="selected_participants">
 
     </div>
 
     <br>
     <br>
-    <h4>Participants conectados</h4>
-    <p>Nota: para actualizar el screener de los participantes tienen que refrescar esta pagina. Si quieren apagar el algoritmo que ordena usando screener agreguen el parametro get <i>cancel_sort</i> (o hagan click <a href="?cancel_sort=true">aca</a>) </p>
+    <h4>Connected participants</h4>
+    <p>Note: refresh this page to update participant screener values. To disable screener-based sorting, add the `cancel_sort` query parameter or click <a href="?cancel_sort=true">here</a>.</p>
 
     <div id='participants' class="" style="width:80%"></div>
 
@@ -35,10 +35,10 @@
 
     <div style="padding:40px">
         {% if request.GET.debug %}
-        <h4>Crear grupos con participantes conectados</h4>
+        <h4>Create groups from connected participants</h4>
         <div style='padding:10px ' class='row'>
             <div class="form-group mb-2 col-4">
-                <h5>Elegí que experimento crear para los participantes seleccionados</h5>
+                <h5>Choose the experiment for the selected participants</h5>
                 <select class="custom-select" size="3" id='select_experiment'>
                     {% for e in experiment %}
                         <option value='{{ e.id }}'{% if forloop.first %} selected {% endif %}>
@@ -46,11 +46,11 @@
                         </option>
                     {% endfor %}
                 </select>
-                <a class="btn btn-success" href='javascript:create_group()'>Crear grupo con los seleccionados</a>
+                <a class="btn btn-success" href='javascript:create_group()'>Create group with selected participants</a>
                 <br>
                 <br>
 
-                <a class="btn btn-success" href='javascript:select_first_five_options()'>Seleccionar primeros 5</a>
+                <a class="btn btn-success" href='javascript:select_first_five_options()'>Select first 5</a>
             </div>
         </div>
         {% endif %}
@@ -94,11 +94,11 @@
                 <th scope="col"></th>
                 <th scope="col">id</th>
                 <th scope="col">nickname</th>
-                <th scope="col">Nombre</th>
+                <th scope="col">Name</th>
                 <th scope="col">Screener</th>
                 <th scope="col">email</th>
                 <th scope="col">Last update</th>
-                <th scope="col">Grupo</th>
+                <th scope="col">Group</th>
                 <th scope="col">Current stage</th>
             </tr>
         </thead>
@@ -155,18 +155,18 @@
         console.log('selected',arr)
 
         if (arr.length < {{MIN_GROUP_SIZE}}){
-            alert('Necesitamos grupos con al menos {{MIN_GROUP_SIZE}} participantes')
+            alert('Groups must contain at least {{MIN_GROUP_SIZE}} participants')
         }
 
         if (arr.length > {{MAX_GROUP_SIZE}}){
-            alert('Necesitamos grupos con menos de {{MAX_GROUP_SIZE}} participantes')
+            alert('Groups must contain at most {{MAX_GROUP_SIZE}} participants')
         }
 
         if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){
             $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id},function(){
                 location.reload();
             }).fail(function() {
-                alert( "Fallo el post de crear grupos!" );
+                alert("Failed to create groups");
             })
         }
     }
@@ -180,18 +180,18 @@
         console.log('selected',arr)
 
         if (arr.length < {{MIN_GROUP_SIZE}}){
-            alert('Necesitamos grupos con al menos {{MIN_GROUP_SIZE}} participantes')
+            alert('Groups must contain at least {{MIN_GROUP_SIZE}} participants')
         }
 
         if (arr.length > {{MAX_GROUP_SIZE}}){
-            alert('Necesitamos grupos con menos de {{MAX_GROUP_SIZE}} participantes')
+            alert('Groups must contain at most {{MAX_GROUP_SIZE}} participants')
         }
 
         if ((arr.length <= {{MAX_GROUP_SIZE}}) & (arr.length >= {{MIN_GROUP_SIZE}})){
             $.post('/manager/create_group',{'participants_ids_list':arr, experiment_id:experiment_id},function(){
                 location.reload();
             }).fail(function() {
-                alert( "Fallo el post de crear grupos!" );
+                alert("Failed to create groups");
             })
         }
     }
@@ -209,14 +209,14 @@
     }
 
     function select_first_n_options(n){
-        // des-selecciono todos primero
+        // Clear all current selections first.
         $('input[name="new_group_ids"]:enabled').each(function(){
             this.checked=false;
             participants_checked.delete(this.value);
         })
         $("#selected_participants").html('')
 
-        // selecciono los primeros n
+        // Select the first n participants.
         $('input[name="new_group_ids"]:enabled').slice(0,n).each(function(){
             this.checked=true;
             check_input(this);
@@ -235,7 +235,7 @@
     }
 
     function select_n_random(n){
-        // des-selecciono todos primero
+        // Clear all current selections first.
         $('input[name="new_group_ids"]:enabled').each(function(){
             this.checked=false;
             participants_checked.delete(this.value);
@@ -247,7 +247,7 @@
         shuffleArray(participants_input)
 
 
-        // selecciono los primeros n
+        // Select the first n participants.
         participants_input.slice(0,n).each(function(){
             this.checked=true;
             check_input(this);
@@ -257,7 +257,7 @@
     }
     
     function select_best_for_moral_exp(){
-        // des-selecciono todos primero
+        // Clear all current selections first.
         $('input[name="new_group_ids"]:enabled').each(function(){
             this.checked=false;
             participants_checked.delete(this.value);

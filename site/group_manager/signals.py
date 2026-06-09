@@ -11,4 +11,4 @@ def experiment_create_post_save(sender, instance, created, **kwargs):
             for stage in Stage.objects.all():
                 StageTimes.objects.get_or_create(experiment=instance, stage=stage, timeout_in_seconds=300)
         except:
-            print('Except in signals doctor_create_post_save', instance.id)
+            print('Exception in signals experiment_create_post_save', instance.id)

@@ -18,11 +18,11 @@ function polling() {
     });
 
     if ((current_stage != null) && (current_stage.includes('s2_'))) {
-        // me fijo que el chatSocket este ok por si se cae.
+        // Make sure the chatSocket is still alive in case it dropped.
         if ((chatSocket == null) || (chatSocket.readyState == WebSocket.CLOSED)) {
-            // se cayo, trato de reconectar
-            if (chatSocket == null) console.log('En polling, chatSocket == null');
-            else console.log('En polling, chatSocket.readyState: ', chatSocket.readyState);
+            // It dropped, try to reconnect.
+            if (chatSocket == null) console.log('In polling, chatSocket == null');
+            else console.log('In polling, chatSocket.readyState: ', chatSocket.readyState);
             create_chat_and_connect();
         }
     }
@@ -123,7 +123,7 @@ function check_and_submit_not_sent_answer(stage_name) {
     }
 }
 
-// esta funcion tiene manejar la actualziacion del timer
+// This function handles updating the timer.
 function set_timeout_clock(timeout_obj) {
     console.log('set_timeout_clock', timeout_obj)
     current_timer_interval = setInterval(timer_update, 1000)
@@ -396,7 +396,7 @@ function render_next_step_s2(stage_name) {
 
     add_trigger_to_chat(trigger);
 
-    // Si estoy en s2_1 y tengo definido un primer lo muestro
+    // If we are in s2_1 and instructions are defined, show them.
     if (stage_name == 's2_1' && experiment_has_instructions_s2 ){
         show_instructions_s2()
     }
@@ -477,10 +477,10 @@ async function render_next_step(stage_name) {
         modal_hide_wait("modal_submit_answers");
         s2_question_timestamp_start = new Date();
         $("#status").show()
-        // saco modals por las dudas de nuevo
+        // Hide modals again just in case.
         // modal_hide_wait();
         render_next_step_s2(stage_name);
-        // pongo esto aca nuevamente para evitar una rice condition con los modals
+        // Run this again here to avoid a race condition with the modals.
         setTimeout(function() {modal_hide_wait("modal_submit_answers")}, 2000);
     }
 
@@ -505,7 +505,7 @@ function next_question_for_moral(index_current_question, stage_name, slider_id){
     }else{
         $("#"+slider_id+"_alert_move_slider").show()
         //
-        // input_field.setCustomValidity("Por favor definí primero tu respuesta");
+        // input_field.setCustomValidity("Please set your answer first");
         // input_field.reportValidity();
     }
 }
@@ -515,11 +515,11 @@ async function next_question(index_current_question, stage_name) {
     index_current_question = parseInt(index_current_question);
     $("." + stage_name + "_questions_item").hide()
 
-    // levanto la info y la guardo en las variables answer_dic_s
+    // Read the info and store it in the answer_dic_s variables.
     var question_id = question_order[index_current_question].question_id;
     var input_value = $("#" + stage_name + "_input_" + question_id).val();
     var question_id_check = $("#" + stage_name + "_question_id_" + question_id).val();
-    if (question_id_check != question_id) console.log('Error, esto no deberia pasar')
+    if (question_id_check != question_id) console.log('Error, this should not happen')
     var confidence = $('input[name=' + stage_name + '_slider_' + question_id + ']:checked').val()
 
 
@@ -533,7 +533,7 @@ async function next_question(index_current_question, stage_name) {
         }
         answer_dic_s1[question_id] = r
 
-        // lleno los valore para s3
+        // Pre-fill the values for s3.
         $("#s3_input_" + question_id).val(input_value);
         $("#s3_slider_" + question_id).val(confidence);
     }
@@ -553,7 +553,7 @@ async function next_question(index_current_question, stage_name) {
 
     if (index_current_question == (question_order.length - 1)) {
         submit_answers(stage_name);
-        // oculto todo y muestro modal
+        // Hide everything and show the waiting modal.
         $(".step").hide()
         $("#status").hide()
         $("#step_s3_controlls").hide();
@@ -562,7 +562,7 @@ async function next_question(index_current_question, stage_name) {
         if (current_stage == 's1') await modal_show_wait();
     } else {
         $("#" + stage_name + "_question_item_" + (question_order[(index_current_question + 1)].question_id)).show()
-        // todo no esta andando por ahi es porque no se rendirzo aun?
+        // TODO: not working sometimes, maybe because it hasn't rendered yet?
         $("#" + stage_name + "_input_" + question_order[(index_current_question + 1)].question_id).focus();
         // this fix error in ticks
         $(".sliders").slider('refresh');
@@ -643,7 +643,7 @@ function submit_consensus() {
     $.post('/answer', { 'answer_dic_s2': JSON.stringify(data), 'stage_frontend': current_stage });
 
     $('.consensus_ok').hide();
-    $("#control_consenso").hide();
+    $("#consensus_controls").hide();
 
     add_consensus_to_chat(value);
 
@@ -657,17 +657,17 @@ function reset_consensus_inputs() {
 
     $("#consensus_value").val('');
     $(".consensus_ok").hide();
-    $("#control_consenso").show();
+    $("#consensus_controls").show();
 }
 
 function consensus_checkbox_change() {
 
     $('#modal_consensus').on('hidden.bs.modal', function (e) {
-        console.log('se cerro el modal')
+        console.log('modal closed')
         $("#consensus_checkbox").prop('checked',false)
     })
     $('#modal_consensus').on('hide.bs.modal', function (e) {
-        console.log('se cerro el modal')
+        console.log('modal closed')
         $("#consensus_checkbox").prop('checked',false)
     })
 
@@ -710,7 +710,7 @@ function consensus_checkbox_change() {
 // const roomName = JSON.parse(document.getElementById('room-name').textContent);
 function create_chat_and_connect() {
     if (!chatSocket_semaphore) {
-        console.log('El semaforo no lo dejo pasar a chatSocket')
+        console.log('The semaphore prevented access to chatSocket')
         return;
     }
 
