@@ -163,7 +163,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Channels
 ASGI_APPLICATION = 'mysite.asgi.application'
 CHANNEL_LAYERS = {
-    #Para deploy hay que revisar esto
+    # For deployment, review this: use a Redis-backed channel layer so the
+    # WebSocket layer works across multiple worker processes.
     # 'default': {
     #     'BACKEND': 'channels_redis.core.RedisChannelLayer',
     #     'CONFIG': {
@@ -171,7 +172,7 @@ CHANNEL_LAYERS = {
     #     },
     # },
 
-    #Para local run
+    # For local runs (single process), the in-memory layer is enough.
     'default': {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }

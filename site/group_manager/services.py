@@ -1,3 +1,10 @@
+"""Domain services for the experiment: stage transitions, group creation,
+participant ordering and invitation emails.
+
+This module holds the business logic that drives a participant through the
+experiment state machine (see ``group_manager.models.Stage``) and the helpers
+the staff-facing manager views rely on.
+"""
 from group_manager.models import *
 from django.db import transaction
 from django.utils.crypto import get_random_string
@@ -10,12 +17,12 @@ import pandas as pd
 import numpy as np
 
 def transition(participant, stage2_name):
+    """Record that ``participant`` has entered ``stage2_name``."""
     StageParticipant.objects.create(participant=participant,
                                     stage=stage2_name)
 
 
-# this transition ocurrs when group is created.
-# staff member triggers it
+# This transition occurs when the group is created; a staff member triggers it.
 def transition_ws1_s1(participant):
     current_stage = participant.get_current_stage()
     assert(current_stage.name == 'ws1')
@@ -23,17 +30,19 @@ def transition_ws1_s1(participant):
 
 
 def get_stage_and_change(participant):
+    """Advance the participant to the next stage if the conditions are met,
+    then return the (possibly updated) current stage."""
     current_stage = participant.get_current_stage()
 
     if current_stage.name == 'ws1':
-        # no hago nada porque de ws1 me saca un admin
+        # Do nothing: a staff member moves participants out of ws1 manually.
         pass
 
     # if current_stage.name == 'ws2':
     #     group = participant.group
 
     #     if group.have_active_participants_completed(current_stage):
-    #         print('estoy en get_stage_and_change ws2 TRUE')
+    #         print('in get_stage_and_change ws2 TRUE')
     #         transition(participant, current_stage.next())
 
     if current_stage.name in ['s1']:
@@ -61,11 +70,13 @@ def stage_timeout(participant, stage):
 
 
 def create_question_order(experiment):
+    """Build a randomized question order for a group: the full shuffled list
+    for stage s1/s3, plus a 4-question subset for the s2 discussion stages."""
     questions = [{'question_id': q.id, 'text': q.text}
                  for q in (Question.objects.filter(experiment=experiment))]
 
 
-    # comment shuffling to repeat experimental desing from tedx
+    # Comment out the shuffling to reproduce the experimental design from TEDx.
     random.shuffle(questions)
     questions_new_order = list(questions)
 
@@ -75,15 +86,17 @@ def create_question_order(experiment):
     return questions_new_order, questions_new_order_s2
 
 
-# create group and move participant to s1
+# Create a group and move its participants to s1.
 @transaction.atomic
 def create_group(list_of_participants, experiment_id=1):
+    """Create a new group, attach the participants and move them from the
+    waiting room (ws1) into the first answering stage (s1)."""
     experiment = Experiment.objects.get(id=experiment_id)
-    
-    # Check that all participants are in sw1
+
+    # Check that all participants are in ws1.
     for participant in list_of_participants:
         if participant.get_current_stage() == Stage.get_first_stage():
-            print(f'create_group: participant {participant.id} no estaba en first_stage')
+            print(f'create_group: participant {participant.id} was not in first_stage')
         assert(participant.get_current_stage() == Stage.get_first_stage())
 
     group = Group.objects.create(name=get_random_string(), experiment=experiment)
@@ -114,8 +127,6 @@ def send_invitation_email(participant, timestamp_experiment):
     calendar_end_datetime = '20220112T200000Z'
     calendar_details = ''
     calendar_title = ''
-    link_mas_info_experiment = 'https://'
-
     context = {}
     context['first_name'] = participant.user.first_name
     context['last_name'] = participant.user.last_name
@@ -141,14 +152,16 @@ def get_serialized_questions(participant):
         return [
         {"question_id": q.id, "text": q.text} for q in Question.objects.filter(experiment=experiment)
         ]
-    except: 
-        print('except en get_serialized_questions')
+    except:
+        print('exception in get_serialized_questions')
         return []
 
 
 
 def update_screener_google_form():
-    # version de prueba
+    """Pull screener responses from the Google Form spreadsheet and store each
+    participant's average screener value (used to balance groups by opinion)."""
+    # Test version
     # sheet_id = "1AMzexrvAbVuAGJRLp3nfDfoN0EcZDt5GvDYIF4rPxKs"
     # sheet_name = "Form%20Responses%201"
     try:
@@ -158,14 +171,14 @@ def update_screener_google_form():
         url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
         df = pd.read_csv(url)
 
-        headers_preguntas = ['La oferta y demanda de trabajo sexual debería ser legal.',
+        question_headers = ['La oferta y demanda de trabajo sexual debería ser legal.',
         'No debería existir ningún límite a la libertad de expresión.',
         'La subrogación de vientres para tener hijos debería ser legal.',
         'Todas las personas deberían ser vegetarianas.',
         'De ser científicamente posible, las personas deberían ser inmortales.',
         ]
-        
-        df['screener'] = df[headers_preguntas].values.tolist()
+
+        df['screener'] = df[question_headers].values.tolist()
         dic = dict(df[['Tu email', 'screener']].values)
 
         for email in dic:
@@ -177,9 +190,12 @@ def update_screener_google_form():
         pass
 
 def sort_participant_by_screener(l_arg):
+    """Reorder participants so each group of three mixes opinions: it repeatedly
+    picks the max, the median and the min screener value. Participants with no
+    screener value (-1) are pushed to the end."""
     l = list(l_arg)
 
-    # saco los -1 para poner al final
+    # Pull out the -1 values to place them at the end.
     l_minus1 = [e for e in l if float(e['screener_value']) == -1]
     for e in l_minus1:
         l.remove(e)

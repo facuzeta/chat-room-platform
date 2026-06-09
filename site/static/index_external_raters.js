@@ -10,16 +10,16 @@ function send_external_rater_value(erv_id) {
     $.post('/external_raters/save_rate/'+HASH+"/"+erv_id+"/"+data.value_fermi+'/'+data.value_number,{}).done(function(msg){  })
     .fail(function(xhr, status, error) {
         // error handling
-        alert("Problemas al registrada resultados", error)
+        alert("There was a problem saving the results", error)
     });
 
     console.log(data)
 
 
-    // oculto pregunta actual
+    // Hide the current prompt.
     $("#chat__"+erv_id).hide()
 
-    // muestro proxima pregunta
+    // Show the next prompt.
     var actual_chat_index = $(".rater_valuation").index($("#chat__"+erv_id))
 
     if (actual_chat_index < $(".rater_valuation").length -1){
@@ -28,10 +28,10 @@ function send_external_rater_value(erv_id) {
 
         console.log("next_erv_id=",next_erv_id)
 
-        // muestro
+        // Show it.
         $("#chat__"+next_erv_id).show()
 
-        // pongo poco en el primero input 
+        // Focus the first input.
         $("#value__"+next_erv_id+"__fermi").focus()
 
 

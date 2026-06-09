@@ -13,7 +13,7 @@
              id="chat__{{ erv.id }}"
              style="{% if forloop.first %} {% else %}display:none{% endif %}">
             <div class="col col-8">
-                Chat {{ forloop.counter|add:n_hechos }} / {{total}} - groupo {{erv.group.id}}  -  {{erv.stage}}<br>
+                Chat {{ forloop.counter|add:n_completed }} / {{total}} - group {{erv.group.id}} - {{erv.stage}}<br>
 
                 <label style="font-weight:bold">{{erv.get_question}}</label>
                 <br>
@@ -36,7 +36,7 @@
             </div>
             <div class="col col-4">
                 <br>
-                <h4>Evaluación</h4>
+                <h4>Evaluation</h4>
                 <br>
                 <form action="javascript:send_external_rater_value({{ erv.id }})">
                     <div class="slidecontainer">
@@ -57,7 +57,7 @@
                                id="value__{{ erv.id }}__number">
                     </div>
                     <br>
-                    <button type="submit" class="btn btn-primary" id="">Registrar</button>
+                    <button type="submit" class="btn btn-primary" id="">Save</button>
                 </form>
             </div>
         </div>

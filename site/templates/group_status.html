@@ -28,13 +28,13 @@
     <div class='row'>
         <div class="col col-4">
             <div class="card" style="min-height: 150px;max-width:400px">
-                <div class="card-header">Info grupo</div>
+                <div class="card-header">Group info</div>
                 <div class="card-body">
                     id: {{group.id}} <br>
                     name: {{group.name}} <br>
                     experiment: {{group.experiment}} <br>
                     is_testing: {{group.is_testing}} <br>
-                    <b>Instrucciones:</b><br> {{group.experiment.instructions_s2}} <br>
+                    <b>Instructions:</b><br> {{group.experiment.instructions_s2}} <br>
 
                 </div>
             </div>
@@ -43,7 +43,7 @@
 
         <div class="col col-4">
             <div class="card" style="min-height: 150px;max-width:400px">
-                <div class="card-header">S1 y S3: 8 preguntas orden</div>
+                <div class="card-header">S1 and S3: 8-question order</div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
                         <tbody>
@@ -61,7 +61,7 @@
 
         <div class="col col-4">
             <div class="card" style="min-height: 150px;max-width:400px">
-                <div class="card-header">S2: 4 preguntas orden</div>
+                <div class="card-header">S2: 4-question order</div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
                         <tbody>
@@ -83,7 +83,7 @@
 
     <h3>S1</h3>
 
-    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='tabla_s1'>
+    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='table_s1'>
         <thead class="thead-light">
 
             <tr>
@@ -118,8 +118,8 @@
 
 
     <script>
-        // transpongo más facilmente la tabla_s1
-        $("#tabla_s1").each(function () {
+        // Transpose the S1 table for easier reading.
+        $("#table_s1").each(function () {
             var $this = $(this);
             var newrows = [];
             $this.find("tr").each(function () {
@@ -140,9 +140,9 @@
 
 
 
-    <h3>S2 consenso</h3>
+    <h3>S2 consensus</h3>
   
-    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='tabla_s2_consensos'>
+    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='table_s2_consensus'>
         <thead class="thead-light">
         </thead>
         <tbody>
@@ -160,7 +160,7 @@
 
     <h3>S3</h3>
 
-    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='tabla_s3'>
+    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" id='table_s3'>
         <thead class="thead-light">
 
             <tr>
@@ -195,8 +195,8 @@
 
 
     <script>
-        // transpongo más facilmente la tabla
-        $("#tabla_s3").each(function () {
+        // Transpose the S3 table for easier reading.
+        $("#table_s3").each(function () {
             var $this = $(this);
             var newrows = [];
             $this.find("tr").each(function () {
@@ -246,7 +246,7 @@
         </div>
         <div class="col col-4">
             <br>
-            <h4>Evaluación</h4>
+            <h4>Evaluation</h4>
             <br>
             <form action="javascript:send_expert_evaluation('{{stage}}',{{group.id}})">
                 {% for r in questions_and_answers %}

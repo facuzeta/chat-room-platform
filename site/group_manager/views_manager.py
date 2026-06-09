@@ -62,135 +62,19 @@ def manager_update(request):
     query = Participant.objects.filter(last_beacon__gt=min_time_active)
     participant_list = [serializeParticipant(p) for p in query]
 
-    # # // TODO: test, borrar
-    # for i in range(10):
-    #     ra = random.randint(1,10)
-    #     participant_list.append(
-    #         {'id':10000+i, 'name':"fruta", 
-    #         'email': f'r{ra}@gmail.com', 
-    #         'last_beacon': timezone.now(),
-    #         'has_group': False,
-    #         'nickname': get_random_string(),
-    #         'stage': 'ws1',
-    #         'screener_value': str(ra),
-    #         }
-    #     )
-    # for i in range(2):
-    #     participant_list.append(
-    #         {'id':11000+i, 'name':"fruta", 
-    #         'email': f'r-1@gmail.com', 
-    #         'last_beacon': timezone.now(),
-    #         'has_group': False,
-    #         'nickname': get_random_string(),
-    #         'stage': 'ws1',
-    #         'screener_value': str(-1),
-    #         }
-    #     )
-
-    # participant_list  = [{'id': '10000',
-    # 'name': 'fruta',
-    # 'email': 'r4@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 22931),
-    # 'has_group': False,
-    # 'nickname': 'BCw93N8LKgUB',
-    # 'stage': 'ws1',
-    # 'screener_value': '4'},
-    # {'id': '10001',
-    # 'name': 'fruta',
-    # 'email': 'r2@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23111),
-    # 'has_group': False,
-    # 'nickname': 'Hw6bTezAmdR6',
-    # 'stage': 'ws1',
-    # 'screener_value': '2'},
-    # {'id': '10002',
-    # 'name': 'fruta',
-    # 'email': 'r9@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23171),
-    # 'has_group': False,
-    # 'nickname': 'gtZup7fbjHxu',
-    # 'stage': 'ws1',
-    # 'screener_value': '9'},
-    # {'id': '10003',
-    # 'name': 'fruta',
-    # 'email': 'r9@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23228),
-    # 'has_group': False,
-    # 'nickname': 'LSTQThezMVI8',
-    # 'stage': 'ws1',
-    # 'screener_value': '9'},
-    # {'id': '10004',
-    # 'name': 'fruta',
-    # 'email': 'r6@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23297),
-    # 'has_group': False,
-    # 'nickname': '3G0rYgTez18b',
-    # 'stage': 'ws1',
-    # 'screener_value': '6'},
-    # {'id': '10005',
-    # 'name': 'fruta',
-    # 'email': 'r2@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23387),
-    # 'has_group': False,
-    # 'nickname': 'KZGczxzMFmeH',
-    # 'stage': 'ws1',
-    # 'screener_value': '2'},
-    # {'id': '10006',
-    # 'name': 'fruta',
-    # 'email': 'r4@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23454),
-    # 'has_group': False,
-    # 'nickname': 'TXMGrzqo0O0W',
-    # 'stage': 'ws1',
-    # 'screener_value': '4'},
-    # {'id': '10007',
-    # 'name': 'fruta',
-    # 'email': 'r7@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23524),
-    # 'has_group': False,
-    # 'nickname': 'f5RG4NkAdkaA',
-    # 'stage': 'ws1',
-    # 'screener_value': '7'},
-    # {'id': '10008',
-    # 'name': 'fruta',
-    # 'email': 'r3@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23576),
-    # 'has_group': False,
-    # 'nickname': 'BbBOPjbgUGM2',
-    # 'stage': 'ws1',
-    # 'screener_value': '3'},
-    # {'id': '10010',
-    # 'name': 'fruta',
-    # 'email': 'r-1@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 23981),
-    # 'has_group': False,
-    # 'nickname': 'gtAIfdhYm13j',
-    # 'stage': 'ws1',
-    # 'screener_value': '-1'},
-    # {'id': '10011',
-    # 'name': 'fruta',
-    # 'email': 'r-1@gmail.com',
-    # 'last_beacon': timezone.datetime(2022, 5, 26, 16, 58, 44, 24067),
-    # 'has_group': False,
-    # 'nickname': 'zjPHrqXZBfHp',
-    # 'stage': 'ws1',
-    # 'screener_value': '-1'}]
-
-
-
-    try: 
+    try:
         new_order = sort_participant_by_screener(participant_list)
         res['participants_list'] = new_order
-        # Agrego este chequeo por las dudas
+        # Sanity check: the reordering must not add or drop participants.
         assert(sorted([e['name'] for e in participant_list]) == sorted([e['name'] for e in new_order]))
         assert(sorted([e['screener_value'] for e in participant_list]) == sorted([e['screener_value'] for e in new_order]))
     except:
-        print('Entro en except')
+        print('Entered except branch')
         res['participants_list'] = participant_list
 
-    cancel_sort_en_true = request.GET.get('cancel_sort', "false") == 'true'
-    if  cancel_sort_en_true:
-        print('Parametro get cancel_sort en True' , request.GET.get('cancel_sort', "false"))
+    cancel_sort_is_true = request.GET.get('cancel_sort', "false") == 'true'
+    if cancel_sort_is_true:
+        print('GET param cancel_sort is True', request.GET.get('cancel_sort', "false"))
         res['participants_list'] = participant_list
 
     return JsonResponse(res)

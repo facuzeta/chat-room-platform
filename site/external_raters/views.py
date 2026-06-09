@@ -29,7 +29,7 @@ def rate(request, hash):
         context["erv_this_rater"] = erv_this_rater[:20]
         context["total_real"] = len(erv_this_rater)
         context["total"] = ExternalRateValue.objects.filter(rater=er).count()
-        context["n_hechos"] = ExternalRateValue.objects.filter(
+        context["n_completed"] = ExternalRateValue.objects.filter(
             rater=er, value_fermi__isnull=False, value_number__isnull=False
         ).count()
 
@@ -68,21 +68,21 @@ def create_external_rater(request, hash):
 
     query = ExternalRater.objects.filter(hash=hash)
     if query.exists():
-        return JsonResponse({"status": "error", "msg": "Ya existe rater con este hash"})
+        return JsonResponse({"status": "error", "msg": "A rater with this hash already exists"})
 
     er = ExternalRater.objects.create(hash=hash)
 
-    # todos los grupos
+    # All non-testing groups, excluding the moral experiment.
     groups_to_rate = Group.objects.filter(is_testing=False).exclude(experiment__name="exp_moral")
 
-    # crea todas las ExternalRatevalue con valores vacios
+    # Create one empty ExternalRateValue per group/stage to be rated.
     for group in groups_to_rate:
         for stage in Stage.objects.filter(name__in="s2_1 s2_2 s2_3 s2_4".split()):
-            # si el chat es vacio no lo sumo
+            # Skip empty chats.
             if len(Chat.objects.filter(participant__group=group, stage=stage)) > 0:
                 ExternalRateValue.objects.create(stage=stage, group=group, rater=er)
 
-    return JsonResponse({"status": "ok", "msg": "Creado usuario con hash " + hash})
+    return JsonResponse({"status": "ok", "msg": "Created user with hash " + hash})
 
 
 @staff_member_required
@@ -136,7 +136,7 @@ def download_raters_data(requests):
             "group_id": e.group_id,
             "stage_id": e.stage_id,
             "rater_id": e.user_id,
-            "rater_hash": dic_ourraters_id2username[e.user_id], # todo poner esto como un dic asi termina antes
+            "rater_hash": dic_ourraters_id2username[e.user_id], # TODO: turn this into a dict so it finishes faster
             "value_fermi": e.value,
         }
         for e in ChatExpertEvaluatioAnswer.objects.filter(question=question_fermi)
@@ -149,7 +149,7 @@ def download_raters_data(requests):
             "group_id": e.group_id,
             "stage_id": e.stage_id,
             "rater_id": e.user_id,
-            "rater_hash": dic_ourraters_id2username[e.user_id], # todo poner esto como un dic asi termina antes
+            "rater_hash": dic_ourraters_id2username[e.user_id], # TODO: turn this into a dict so it finishes faster
             "value_number": e.value,
         }
         for e in ChatExpertEvaluatioAnswer.objects.filter(question=question_number)
