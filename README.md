@@ -2,19 +2,6 @@
 
 This repository contains the Django application used to run synchronous chat-based research experiments. It covers the full operational flow: participant onboarding, group assignment, timed question stages, live chat, admin monitoring, invitation management, and post-hoc external rating.
 
-## Screenshots
-
-![Participant registration screen](docs/screenshots/participant-registration.png)
-
-An insight into the platform's aesthetics and performance, beginning with the welcoming participant registration screen.
-
-![Individual participant task](docs/screenshots/individual-task.png)
-
-Depicting an instance of participant tasks, in this scenario involving the reading, responding, and asserting confidence in relation to a moral statement.
-
-![Group chat discussion](docs/screenshots/group-chat-discussion.png)
-
-Illustrating a sample of group discussions conducted in chat settings, showcasing a discussion centered around a factual issue.
 
 ## Docker quick start
 
