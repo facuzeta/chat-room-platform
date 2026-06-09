@@ -2,6 +2,28 @@
 
 This repository contains the Django application used to run synchronous chat-based research experiments. It covers the full operational flow: participant onboarding, group assignment, timed question stages, live chat, admin monitoring, invitation management, and post-hoc external rating.
 
+## Docker quick start
+
+If you want the fastest path to a working local stack:
+
+```bash
+cp .env.docker.example .env.docker
+docker compose up --build
+docker compose run --rm web python manage.py createsuperuser
+```
+
+What happens automatically on `docker compose up --build`:
+
+- PostgreSQL, Redis, MailHog, and the Django app start together
+- the PostgreSQL database container is created if it does not exist yet
+- Django waits for the database to become reachable
+- Django runs `python manage.py migrate`
+- if the database is empty and `BOOTSTRAP_FIXTURES=1`, Django loads the historical fixtures
+
+What does **not** happen automatically:
+
+- creating the Django superuser
+
 ## What this project does
 
 The platform supports a staged experiment with three main roles:
@@ -165,6 +187,16 @@ docker compose up --build
 ```bash
 docker compose run --rm web python manage.py createsuperuser
 ```
+
+### Database and migrations behavior
+
+The Docker entrypoint already handles the core bootstrap:
+
+- database creation is handled by the `postgres` container itself
+- Django migrations run automatically every time the `web` container starts
+- fixtures load automatically only when the database appears empty
+
+That behavior is implemented in `docker/entrypoint.sh`.
 
 ### What Docker config does
 
