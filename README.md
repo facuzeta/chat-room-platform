@@ -213,6 +213,131 @@ That behavior is implemented in `docker/entrypoint.sh`.
 - PostgreSQL: `localhost:5432`
 - Redis: `localhost:6379`
 
+## Run the experiment locally
+
+This is the recommended path for someone who wants to reproduce the application behavior after cloning the repository.
+
+### 1. Start the stack
+
+```bash
+cp .env.docker.example .env.docker
+docker compose up --build
+docker compose run --rm web python manage.py createsuperuser
+```
+
+Then open:
+
+- app: `http://localhost:8000`
+- Django admin: `http://localhost:8000/admin/`
+- manager dashboard: `http://localhost:8000/manager`
+- MailHog: `http://localhost:8025`
+
+### 2. Sign in as staff
+
+Use the superuser you just created and log into:
+
+- `/admin/` for raw model access
+- `/manager` for the staff workflow UI
+
+### 3. Create participants
+
+The simplest path is:
+
+- open `/manager/invite_participants`
+- create one or more participants
+- save the generated records
+
+You can also inspect or edit them later in `/admin/`.
+
+### 4. Send or inspect invitation emails
+
+When using the Docker setup, invitation emails do not go to real inboxes.
+
+- the app sends them to MailHog
+- open `http://localhost:8025`
+- inspect the captured email
+- copy the participant login link from there
+
+### 5. Open participant sessions
+
+Each participant enters the experiment through a URL like:
+
+```text
+/login?hash=<participant-hash>
+```
+
+You can get that link either:
+
+- from the invitation email shown in MailHog
+- or by inspecting the participant record in the admin/manager views
+
+If you want to simulate multiple participants, open multiple browser windows or profiles and log in with different hashes.
+
+### 6. Move participants into a group
+
+Participants first wait in `ws1`.
+
+To start an experiment session:
+
+- open `/manager`
+- wait until participants appear as connected
+- select the participants
+- choose the experiment
+- create the group
+
+That action moves them from the waiting stage into the first individual-answer stage.
+
+### 7. Run through the experiment
+
+The expected stage flow is:
+
+1. `ws1` waiting room
+2. `s1` individual answers
+3. `s2_1` to `s2_4` timed chat/discussion stages
+4. `s3` final individual answers
+5. `thanks`
+
+During this flow:
+
+- participants interact through the browser UI
+- staff can monitor progress from `/manager/groups_list`
+- individual sessions can be inspected in `/manager/group_status/<group_id>`
+
+### 8. Review exported data
+
+Once you have completed at least one session, you can inspect the resulting data:
+
+- open `/manager/export_all` as a staff user
+- review grouped answers, chats, and expert-evaluation data as JSON
+
+### 9. Use the external rater workflow
+
+To exercise the post-hoc rating flow:
+
+- create an external rater entry
+- open the corresponding route under `/external_raters/`
+- score completed chat stages
+
+The manager and external-rater templates expose the operational flow, but they assume experiment data already exists.
+
+## What the fixtures provide
+
+The bundled fixtures give you:
+
+- baseline CMS content
+- experiment definitions
+- question text
+- configuration needed for the historical experiment setup
+
+They do not create:
+
+- a Django superuser
+- active participant browser sessions
+- completed chats
+- external rater records ready to use
+
+Those still need to be created through the application workflow.
+
 ## Main routes
 
 Useful routes during development:
