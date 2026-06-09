@@ -2,6 +2,42 @@
 
 This repository contains the Django application used to run synchronous chat-based research experiments. It covers the full operational flow: participant onboarding, group assignment, timed question stages, live chat, admin monitoring, invitation management, and post-hoc external rating.
 
+## Screenshots
+
+![Participant registration screen](docs/screenshots/participant-registration.png)
+
+An insight into the platform's aesthetics and performance, beginning with the welcoming participant registration screen.
+
+![Individual participant task](docs/screenshots/individual-task.png)
+
+Depicting an instance of participant tasks, in this scenario involving the reading, responding, and asserting confidence in relation to a moral statement.
+
+![Group chat discussion](docs/screenshots/group-chat-discussion.png)
+
+Illustrating a sample of group discussions conducted in chat settings, showcasing a discussion centered around a factual issue.
+
+## Docker quick start
+
+If you want the fastest path to a working local stack:
+
+```bash
+cp .env.docker.example .env.docker
+docker compose up --build
+docker compose run --rm web python manage.py createsuperuser
+```
+
+What happens automatically on `docker compose up --build`:
+
+- PostgreSQL, Redis, MailHog, and the Django app start together
+- the PostgreSQL database container is created if it does not exist yet
+- Django waits for the database to become reachable
+- Django runs `python manage.py migrate`
+- if the database is empty and `BOOTSTRAP_FIXTURES=1`, Django loads the historical fixtures
+
+What does **not** happen automatically:
+
+- creating the Django superuser
+
 ## What this project does
 
 The platform supports a staged experiment with three main roles:
@@ -35,8 +71,6 @@ Safe places to translate or polish:
 - staff/admin templates and operational copy
 - developer documentation
 
-For the working rule used in this branch, see `docs/translation-boundary.md`.
-
 ## Stack
 
 - Python 3
@@ -60,7 +94,6 @@ Key Python dependencies are listed in `site/requirements.txt`.
 - `site/external_raters/` post-hoc review workflow
 - `site/templates/` participant, staff, and rater templates
 - `site/static/` frontend JavaScript and CSS
-- `docs/` developer-facing repository notes
 
 ## Local setup
 
@@ -84,20 +117,27 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file that Django can read before startup. At minimum:
+4. Create a `.env` file that Django can read before startup:
+
+```bash
+cp .env.example .env
+```
+
+At minimum:
 
 ```env
 SECRET_KEY=your-secret-key
 ALLOWED_HOSTS=127.0.0.1 localhost
-EMAIL_HOST_PASSWORD=your-email-password
 DEBUG=True
 ```
 
 Notes:
 
 - `mysite/settings.py` reads environment variables with `django-environ`.
+- The app loads `.env` from either the repository root or `site/.env`.
 - Local development uses SQLite by default.
-- Production database settings switch automatically when AWS RDS variables are present.
+- You can switch to PostgreSQL by setting `DATABASE_URL`.
+- Email, domain, Redis, and screener sync are all environment-driven now.
 
 5. Create the database:
 
@@ -132,6 +172,185 @@ If you only need standard Django endpoints and are not testing WebSockets, `runs
 ```bash
 python manage.py runserver
 ```
+
+## Docker development stack
+
+The repository now includes a development Docker stack with:
+
+- Django + Daphne
+- PostgreSQL
+- Redis
+- MailHog for local email capture
+
+### First-time setup
+
+1. Copy the Docker environment template:
+
+```bash
+cp .env.docker.example .env.docker
+```
+
+2. Build and start the stack:
+
+```bash
+docker compose up --build
+```
+
+3. Create an admin user in the running container:
+
+```bash
+docker compose run --rm web python manage.py createsuperuser
+```
+
+### Database and migrations behavior
+
+The Docker entrypoint already handles the core bootstrap:
+
+- database creation is handled by the `postgres` container itself
+- Django migrations run automatically every time the `web` container starts
+- fixtures load automatically only when the database appears empty
+
+That behavior is implemented in `docker/entrypoint.sh`.
+
+### What Docker config does
+
+- `DATABASE_URL` points Django to the bundled PostgreSQL container.
+- `REDIS_URL` enables a Redis-backed Channels layer.
+- `EMAIL_HOST=mailhog` routes invitation emails to MailHog instead of a real SMTP provider.
+- `BOOTSTRAP_FIXTURES=1` loads the historical fixtures only when the database is empty.
+- `ENABLE_SCREENER_SYNC=False` avoids depending on the external Google Sheet during local Docker runs.
+
+### Useful Docker endpoints
+
+- app: `http://localhost:8000`
+- MailHog UI: `http://localhost:8025`
+- PostgreSQL: `localhost:5432`
+- Redis: `localhost:6379`
+
+## Run the experiment locally
+
+This is the recommended path for someone who wants to reproduce the application behavior after cloning the repository.
+
+### 1. Start the stack
+
+```bash
+cp .env.docker.example .env.docker
+docker compose up --build
+docker compose run --rm web python manage.py createsuperuser
+```
+
+Then open:
+
+- app: `http://localhost:8000`
+- Django admin: `http://localhost:8000/admin/`
+- manager dashboard: `http://localhost:8000/manager`
+- MailHog: `http://localhost:8025`
+
+### 2. Sign in as staff
+
+Use the superuser you just created and log into:
+
+- `/admin/` for raw model access
+- `/manager` for the staff workflow UI
+
+### 3. Create participants
+
+The simplest path is:
+
+- open `/manager/invite_participants`
+- create one or more participants
+- save the generated records
+
+You can also inspect or edit them later in `/admin/`.
+
+### 4. Send or inspect invitation emails
+
+When using the Docker setup, invitation emails do not go to real inboxes.
+
+- the app sends them to MailHog
+- open `http://localhost:8025`
+- inspect the captured email
+- copy the participant login link from there
+
+### 5. Open participant sessions
+
+Each participant enters the experiment through a URL like:
+
+```text
+/login?hash=<participant-hash>
+```
+
+You can get that link either:
+
+- from the invitation email shown in MailHog
+- or by inspecting the participant record in the admin/manager views
+
+If you want to simulate multiple participants, open multiple browser windows or profiles and log in with different hashes.
+
+### 6. Move participants into a group
+
+Participants first wait in `ws1`.
+
+To start an experiment session:
+
+- open `/manager`
+- wait until participants appear as connected
+- select the participants
+- choose the experiment
+- create the group
+
+That action moves them from the waiting stage into the first individual-answer stage.
+
+### 7. Run through the experiment
+
+The expected stage flow is:
+
+1. `ws1` waiting room
+2. `s1` individual answers
+3. `s2_1` to `s2_4` timed chat/discussion stages
+4. `s3` final individual answers
+5. `thanks`
+
+During this flow:
+
+- participants interact through the browser UI
+- staff can monitor progress from `/manager/groups_list`
+- individual sessions can be inspected in `/manager/group_status/<group_id>`
+
+### 8. Review exported data
+
+Once you have completed at least one session, you can inspect the resulting data:
+
+- open `/manager/export_all` as a staff user
+- review grouped answers, chats, and expert-evaluation data as JSON
+
+### 9. Use the external rater workflow
+
+To exercise the post-hoc rating flow:
+
+- create an external rater entry
+- open the corresponding route under `/external_raters/`
+- score completed chat stages
+
+The manager and external-rater templates expose the operational flow, but they assume experiment data already exists.
+
+## What the fixtures provide
+
+The bundled fixtures give you:
+
+- baseline CMS content
+- experiment definitions
+- question text
+- configuration needed for the historical experiment setup
+
+They do not create:
+
+- a Django superuser
+- active participant browser sessions
+- completed chats
+- external rater records ready to use
+
+Those still need to be created through the application workflow.
 
 ## Main routes
 
@@ -189,6 +408,24 @@ python manage.py loaddata group_manager/fixtures/data_for_spanish_experiments.js
 python3 -m compileall site/group_manager site/external_raters site/mysite
 ```
 
+- Start the full Docker stack:
+
+```bash
+docker compose up --build
+```
+
+- Stop the Docker stack:
+
+```bash
+docker compose down
+```
+
+- Reset the Docker database volume:
+
+```bash
+docker compose down -v
+```
+
 ## Operational notes
 
 - Local development uses the in-memory Channels layer configured in `site/mysite/settings.py`.
@@ -196,6 +433,7 @@ python3 -m compileall site/group_manager site/external_raters site/mysite
 - `update_screener_google_form()` pulls screener data from a Google Sheet and is triggered from the manager dashboard.
 - Invitation emails are rendered from `site/templates/email_invitation.html`.
 - Group creation and stage-transition logic lives primarily in `site/group_manager/services.py`.
+- For local Docker runs, MailHog captures outbound email so no real invitations are sent.
 
 ## Data and content
 
@@ -225,4 +463,5 @@ When making maintenance changes:
 
 - Some participant-facing labels are still intentionally embedded in Spanish because they are part of the original experiment record.
 - The local setup depends on loading historical fixtures rather than a generalized bootstrap command.
-- WebSocket deployment settings are minimal for local use and should be reviewed before production reuse.
+- The screener sync still depends on an external Google Sheet when `ENABLE_SCREENER_SYNC=True`.
+- WebSocket and email settings are now environment-driven, but production deployment still needs explicit infra choices for PostgreSQL, Redis, and SMTP.

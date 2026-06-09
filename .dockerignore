@@ -1,0 +1,11 @@
+.git
+.gitignore
+docs
+site/venv
+site/__pycache__
+site/*/__pycache__
+site/*/*/__pycache__
+site/db.sqlite3
+site/staticfiles
+.env
+.env.docker

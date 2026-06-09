@@ -18,6 +18,7 @@ from group_manager.views import get_cms
 from django.contrib.admin.views.decorators import staff_member_required
 import dateutil.parser
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 
 @staff_member_required
@@ -27,7 +28,8 @@ def manager(request):
     context['MAX_GROUP_SIZE'] = Config.get('MAX_GROUP_SIZE')
     context['cms'] = get_cms()
     context['experiment'] = Experiment.objects.all()
-    update_screener_google_form()
+    if settings.ENABLE_SCREENER_SYNC:
+        update_screener_google_form()
 
     return render(request, 'manager.html', context)
 
@@ -305,5 +307,4 @@ def save_expert_valuation(request):
         cee.save()                                                           
 
     return JsonResponse({}, safe=False)
-
 
